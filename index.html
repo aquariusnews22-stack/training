@@ -197,6 +197,7 @@ header p{font-size:11px;color:var(--muted);}
 .scale-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}
 .scale-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;transition:all .15s;}
 .scale-btn.sel{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.scale-hint{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:5px;font-family:'DM Mono',monospace;}
 .sleep-row{display:flex;gap:8px;align-items:center;}
 .sleep-row input{flex:0 0 80px;}
 .sleep-row span{font-size:12px;color:var(--muted);}
@@ -255,6 +256,46 @@ header p{font-size:11px;color:var(--muted);}
 .sos-item-desc{font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5;}
 .sos-log-entry{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:6px;}
 
+
+/* ===== BADGES ===== */
+.badge-row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.badge{font-size:22px;opacity:0.2;transition:all .4s;filter:grayscale(1);}
+.badge.earned{opacity:1;filter:grayscale(0);animation:badgePop .4s ease;}
+@keyframes badgePop{0%{transform:scale(0.5);}70%{transform:scale(1.2);}100%{transform:scale(1);}}
+.badge-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:center;margin-top:2px;}
+.badge-wrap{display:flex;flex-direction:column;align-items:center;}
+
+
+/* ===== MENTAL TAB – DATUM / STREAK / KURVE ===== */
+.mental-date-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface);}
+.mental-date-bar input[type="date"]{flex:1;font-family:"DM Mono",monospace;font-size:13px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:7px 10px;}
+.mental-date-nav{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mental-date-nav:active{background:var(--surface2);}
+.mental-today-btn{font-family:"DM Mono",monospace;font-size:11px;padding:6px 12px;border-radius:20px;border:1px solid var(--purple-border);background:transparent;color:var(--purple);}
+.mental-streak-wrap{padding:12px 16px 6px;}
+.mental-streak-label{font-family:"DM Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
+.mental-streak-row{display:flex;gap:6px;}
+.mental-streak-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.mental-streak-dot{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .3s;}
+.mental-streak-dot.filled{background:var(--purple-dim);border-color:var(--purple);}
+.mental-streak-dot.today{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim);}
+.mental-streak-dot.partial{background:rgba(176,96,240,0.05);border-color:rgba(176,96,240,0.4);}
+.mental-streak-dname{font-family:"DM Mono",monospace;font-size:9px;color:var(--muted);}
+.mental-chart-wrap{padding:6px 16px 12px;border-bottom:1px solid var(--border);}
+.mental-curve-labels{display:flex;justify-content:space-between;margin-top:4px;}
+.mental-curve-labels span{font-family:"DM Mono",monospace;font-size:9px;color:var(--muted);}
+#mental-content{padding:0 16px 20px;}
+.mental-header{padding:14px 16px 8px;}
+.mental-header h2{font-family:"DM Mono",monospace;font-size:15px;font-weight:500;color:var(--purple);}
+.mental-header p{font-size:12px;color:var(--muted);margin-top:3px;}
+/* Badge CSS */
+.badge-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;padding:0 16px 8px;}
+.badge-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.badge{font-size:24px;opacity:.2;filter:grayscale(1);transition:all .4s;}
+.badge.earned{opacity:1;filter:grayscale(0);animation:badgePop .5s ease;}
+@keyframes badgePop{0%{transform:scale(.5);}70%{transform:scale(1.25);}100%{transform:scale(1);}}
+.badge-label{font-family:"DM Mono",monospace;font-size:9px;color:var(--muted);text-align:center;}
+
 /* ===== PRINT ===== */
 @media print{
   body{background:#fff;color:#000;padding-bottom:0;}
@@ -297,6 +338,25 @@ header p{font-size:11px;color:var(--muted);}
     <h2>⚡ Mentale Stärke</h2>
     <p>Trainiere deinen Geist wie einen Muskel – täglich, konsequent.</p>
   </div>
+  <!-- Datum-Auswahl -->
+  <div class="mental-date-bar">
+    <button class="mental-date-nav" onclick="shiftMentalDate(-1)">←</button>
+    <input type="date" id="mental-date-input" onchange="onMentalDateChange(this.value)">
+    <button class="mental-date-nav" onclick="shiftMentalDate(1)">→</button>
+    <button class="mental-today-btn" onclick="setMentalToday()">Heute</button>
+  </div>
+  <!-- 7-Tage Streak -->
+  <div class="mental-streak-wrap">
+    <div class="mental-streak-label">7-Tage Streak</div>
+    <div id="mental-streak-row" class="mental-streak-row"></div>
+  </div>
+  <!-- Wochenkurve -->
+  <div class="mental-chart-wrap">
+    <div class="mental-streak-label">Befinden diese Woche</div>
+    <svg id="mental-curve" viewBox="0 0 300 80" preserveAspectRatio="none" style="width:100%;height:80px;display:block;"></svg>
+    <div id="mental-curve-labels" class="mental-curve-labels"></div>
+  </div>
+  <!-- Tages-Inhalt -->
   <div id="mental-content"></div>
 </div>
 
@@ -750,11 +810,89 @@ function switchView(v){
     document.getElementById(`nav-${id}`).classList.toggle('active',v===id);
   });
   if(v==='log')renderLog();
-  if(v==='mental')renderMental();
+  if(v==='mental'){
+    // Datum-Input auf heute setzen wenn noch leer
+    const inp=document.getElementById('mental-date-input');
+    if(inp&&!inp.value){
+      mentalCurrentDate=new Date().toISOString().split('T')[0];
+      inp.value=mentalCurrentDate;
+    }
+    renderMental();
+  }
 }
 
 // =====================================================
 // FORTSCHRITT BERECHNEN
+
+// =====================================================
+// AUFWÄRMEN – STATE-KEYS & FUNKTIONEN
+// =====================================================
+
+const wuCardioDevk  = (wi,di) => `tp3_w${wi}d${di}_wu_dev`;
+const wuCardioZeitk = (wi,di) => `tp3_w${wi}d${di}_wu_zeit`;
+const wuCardioDistk = (wi,di) => `tp3_w${wi}d${di}_wu_dist`;
+const wuCardioDonk  = (wi,di) => `tp3_w${wi}d${di}_wu_done`;
+const wuExtrak      = (wi,di) => `tp3_w${wi}d${di}_wu_extra`;
+
+// Splittet Warmup-String in Cardio-Teil und Extra-Teil
+function parseWarmup(warmupStr){
+  const plusIdx = warmupStr.indexOf(' + ');
+  if(plusIdx===-1) return {cardio:warmupStr, extra:null};
+  return {cardio:warmupStr.substring(0,plusIdx).trim(), extra:warmupStr.substring(plusIdx+3).trim()};
+}
+
+function renderWarmupCard(wi,di,warmupStr){
+  const DEVICES=['Rudergerät','Laufband','Ski-Erg','Fahrrad / Bike','Crosstrainer','Sonstiges'];
+  const parsed    = parseWarmup(warmupStr);
+  const savedDev  = lv(wuCardioDevk(wi,di))  || 'Rudergerät';
+  const savedZeit = lv(wuCardioZeitk(wi,di));
+  const savedDist = lv(wuCardioDistk(wi,di));
+  const cardioDone= lb(wuCardioDonk(wi,di));
+  const extraDone = lb(wuExtrak(wi,di));
+
+  let html=`<div class="warmup-card">
+    <div class="warmup-top"><span class="card-label">Aufwärmen</span></div>
+    <div class="warmup-cardio-row">
+      <select id="wudev-${wi}-${di}" onchange="sv(wuCardioDevk(${wi},${di}),this.value)">
+        ${DEVICES.map(d=>`<option${savedDev===d?' selected':''}>${d}</option>`).join('')}
+      </select>
+      <input type="number" inputmode="decimal" min="0" step="1" placeholder="Min."
+        value="${savedZeit}" title="Dauer in Minuten"
+        onchange="sv(wuCardioZeitk(${wi},${di}),this.value)" onfocus="this.select()">
+      <span class="wunit">Min.</span>
+      <input type="number" inputmode="decimal" min="0" step="0.01" placeholder="km"
+        value="${savedDist}" title="Distanz in km"
+        onchange="sv(wuCardioDistk(${wi},${di}),this.value)" onfocus="this.select()">
+      <span class="wunit">km</span>
+      <button class="warmup-cardio-check${cardioDone?' done':''}" id="wucardiobtn-${wi}-${di}"
+        onclick="toggleWuCardio(${wi},${di})">${cardioDone?'✓':'○'}</button>
+    </div>`;
+
+  if(parsed.extra){
+    html+=`<div class="warmup-extra-row">
+      <button class="warmup-extra-check${extraDone?' done':''}" id="wuextrabtn-${wi}-${di}"
+        onclick="toggleWuExtra(${wi},${di})">${extraDone?'✓':'○'}</button>
+      <span class="warmup-extra-text">${parsed.extra}</span>
+    </div>`;
+  }
+  html+=`</div>`;
+  return html;
+}
+
+function toggleWuCardio(wi,di){
+  const k=wuCardioDonk(wi,di); const nv=!lb(k); sb(k,nv);
+  const btn=document.getElementById(`wucardiobtn-${wi}-${di}`);
+  if(btn){btn.className='warmup-cardio-check'+(nv?' done':'');btn.textContent=nv?'✓':'○';}
+  checkDayDone(wi,di); updateGlobalProgress();
+}
+
+function toggleWuExtra(wi,di){
+  const k=wuExtrak(wi,di); const nv=!lb(k); sb(k,nv);
+  const btn=document.getElementById(`wuextrabtn-${wi}-${di}`);
+  if(btn){btn.className='warmup-extra-check'+(nv?' done':'');btn.textContent=nv?'✓':'○';}
+  checkDayDone(wi,di); updateGlobalProgress();
+}
+
 // =====================================================
 function countDayChecks(wi,di){
   const day=DATA[wi].days[di];
@@ -1056,9 +1194,9 @@ function renderTagesLog(wi,di){
     {key:'supplements',label:'Supplements / NEMs heute',type:'textarea'},
     {key:'aktivitaeten',label:'Weitere Aktivitäten heute',type:'textarea'},
   ];
-  const energyVal=lv(tlk(wi,di,'energie'));
+  const energyVal=parseInt(lv(tlk(wi,di,'energie')))||0;
   const schlafH=lv(tlk(wi,di,'schlafh'));
-  const schlafQ=lv(tlk(wi,di,'schlafq'));
+  const schlafQ=parseInt(lv(tlk(wi,di,'schlafq')))||0;
 
   let html=`<div class="tageslog-section">
     <button class="tageslog-toggle-btn" onclick="toggleTagesLog(${wi},${di})">
@@ -1066,13 +1204,14 @@ function renderTagesLog(wi,di){
     </button>
     <div class="tageslog-body" id="tlbody-${wi}-${di}">`;
 
-  // Körpergefühl Skala
+  // Körpergefühl Skala 1-10
   html+=`<div class="tl-section">
-    <input class="tl-label-editable" type="text" value="${lv(tlhk(wi,di,'energie'))||'Körpergefühl & Energie (1–10)'}"
+    <input class="tl-label-editable" type="text" value="${lv(tlhk(wi,di,'energie'))||'Körpergefühl & Energie'}"
       onchange="sv(tlhk(${wi},${di},'energie'),this.value)">
+    <div class="scale-hint"><span>1 = erschöpft</span><span>10 = voller Energie</span></div>
     <div class="scale-row">`;
   for(let i=1;i<=10;i++){
-    html+=`<button class="scale-btn${energyVal==i?' sel':''}" onclick="setScale(${wi},${di},'energie',${i})">${i}</button>`;
+    html+=`<button class="scale-btn${energyVal===i?' sel':''} scale-group-energie" data-val="${i}" onclick="setScale(${wi},${di},'energie',${i})">${i}</button>`;
   }
   html+=`</div></div>`;
 
@@ -1082,9 +1221,12 @@ function renderTagesLog(wi,di){
     <div class="sleep-row">
       <input type="number" inputmode="decimal" step="0.5" min="0" max="16" placeholder="h" value="${schlafH}"
         onchange="sv(tlk(${wi},${di},'schlafh'),this.value)" style="flex:0 0 70px">
-      <span>Std. · Qualität:</span>`;
+      <span>Std.</span>
+    </div>
+    <div class="scale-hint" style="margin-top:6px"><span>Qualität: 1 = schlecht</span><span>5 = traumhaft</span></div>
+    <div class="scale-row" style="margin-top:4px">`;
   for(let i=1;i<=5;i++){
-    html+=`<button class="scale-btn${schlafQ==i?' sel':''}" onclick="setScale(${wi},${di},'schlafq',${i})" style="width:30px;height:30px;font-size:10px">${i}</button>`;
+    html+=`<button class="scale-btn${schlafQ===i?' sel':''} scale-group-schlafq" data-val="${i}" onclick="setScale(${wi},${di},'schlafq',${i})">${i}</button>`;
   }
   html+=`</div></div>`;
 
@@ -1111,10 +1253,14 @@ function toggleTagesLog(wi,di){
 
 function setScale(wi,di,field,val){
   sv(tlk(wi,di,field),val);
-  // Update UI
-  const allBtns=document.querySelectorAll(`#tlbody-${wi}-${di} .scale-btn`);
-  // Find the right scale group – simpler: re-render just that section not whole day
-  renderWeek();
+  // Nur die Buttons dieser Skala aktualisieren, kein Re-render
+  const body=document.getElementById(`tlbody-${wi}-${di}`);
+  if(!body)return;
+  const groups=body.querySelectorAll(`.scale-group-${field}`);
+  groups.forEach(btn=>{
+    const bval=parseInt(btn.dataset.val);
+    btn.classList.toggle('sel',bval===val);
+  });
 }
 
 // =====================================================
@@ -1257,9 +1403,11 @@ function printLog(){
   switchView('log');
 }
 
+
 // =====================================================
-// MENTALE STÄRKE
+// MENTALE STÄRKE – vollständig mit Datum & Verlaufskurve
 // =====================================================
+
 const AFFIRMATIONS=[
   "Ich werde stärker mit jedem Training.",
   "Mein Alter ist meine Stärke.",
@@ -1269,25 +1417,208 @@ const AFFIRMATIONS=[
   "Mein Geist führt, mein Körper folgt.",
   "Ich schaffe, was ich mir vornehme.",
   "Stärke wächst, wenn es schwer wird.",
-  "Ich bin dankbar für jeden gesunden Tag.",
-  "47 ist die neue Stärke."
+  "Ich bin dankbar für jeden gesunden Tag."
 ];
+
+// Datumsformat YYYY-MM-DD
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+function dateLabel(str){
+  const d=new Date(str+'T12:00:00');
+  return d.toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'});
+}
+function getLast14Days(){
+  const days=[];
+  for(let i=13;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  return days;
+}
+function getLast7Days(){
+  const days=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  return days;
+}
+
+// State keys für Mental (tagesgebunden)
+const mmk=(date,field)=>`tp3_mental_${date}_${field}`;
+
+// Berechne Mental-Score für einen Tag (0-100)
+function getMentalScore(date){
+  const checks=['atem_morgen','powerposen','anerkennung','atem_abend'];
+  const texts=['fokus','warum','gut','dank1'];
+  let score=0;
+  checks.forEach(k=>{ if(lb(mmk(date,k))) score+=15; });
+  texts.forEach(k=>{ if(lv(mmk(date,k)).length>2) score+=10; });
+  return Math.min(score,100);
+}
+
+// Aktives Datum im Mental-Tab
+let mentalDate = todayStr();
 
 function renderMental(){
   const container=document.getElementById('mental-content');
-  const today=new Date().toISOString().split('T')[0];
-  const mk=(field)=>`tp3_mental_${today}_${field}`;
 
+  // ── HEADER mit Datum-Navigation ──────────────────────────────────────────
+  let html=`<div style="padding:0 0 14px">`;
+
+  // Datum-Picker
+  html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+    <button onclick="shiftMentalDate(-1)" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:18px;display:flex;align-items:center;justify-content:center">‹</button>
+    <input type="date" value="${mentalDate}" onchange="mentalDate=this.value;renderMental()"
+      style="flex:1;font-family:'DM Mono',monospace;font-size:13px;padding:8px 12px;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text)">
+    <button onclick="shiftMentalDate(1)" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:18px;display:flex;align-items:center;justify-content:center">›</button>
+  </div>`;
+
+  // ── VERLAUFSKURVE (14 Tage) ──────────────────────────────────────────────
+  const days14=getLast14Days();
+  const scores=days14.map(d=>getMentalScore(d));
+  const energyVals=days14.map(d=>parseInt(lv(mmk(d,'energie')))||0);
+  const schlafVals=days14.map(d=>parseInt(lv(mmk(d,'schlafq')))||0);
+
+  const hasAnyData = scores.some(s=>s>0)||energyVals.some(v=>v>0)||schlafVals.some(v=>v>0);
+
+  html+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Verlauf – 14 Tage</div>`;
+
+  if(!hasAnyData){
+    html+=`<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0">Noch keine Daten – fang heute an! 🌱</div>`;
+  } else {
+    // SVG Kurve
+    const W=320, H=100, PAD=8;
+    const n=days14.length;
+    const xStep=(W-PAD*2)/(n-1);
+
+    function toY(val,max){ return H-PAD-((val/max)*(H-PAD*2)); }
+    function polyline(vals,max){
+      return vals.map((v,i)=>{
+        const x=PAD+i*xStep;
+        const y=toY(v,max);
+        return `${x},${y}`;
+      }).join(' ');
+    }
+    function polyFill(vals,max){
+      const pts=vals.map((v,i)=>`${PAD+i*xStep},${toY(v,max)}`).join(' ');
+      return `${PAD},${H-PAD} ${pts} ${PAD+(n-1)*xStep},${H-PAD}`;
+    }
+
+    html+=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;overflow:visible">
+      <!-- Hintergrund-Raster -->
+      <line x1="${PAD}" y1="${H-PAD}" x2="${W-PAD}" y2="${H-PAD}" stroke="var(--border)" stroke-width="1"/>
+      <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${H-PAD}" stroke="var(--border)" stroke-width="1"/>`;
+
+    // Mental Score (lila, /100)
+    if(scores.some(s=>s>0)){
+      html+=`<polygon points="${polyFill(scores,100)}" fill="rgba(176,96,240,0.08)"/>
+      <polyline points="${polyline(scores,100)}" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+      scores.forEach((s,i)=>{ if(s>0) html+=`<circle cx="${PAD+i*xStep}" cy="${toY(s,100)}" r="3" fill="var(--purple)"/>`; });
+    }
+    // Energie (grün, /10)
+    if(energyVals.some(v=>v>0)){
+      html+=`<polyline points="${polyline(energyVals,10)}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4,3" stroke-linejoin="round" stroke-linecap="round"/>`;
+      energyVals.forEach((v,i)=>{ if(v>0) html+=`<circle cx="${PAD+i*xStep}" cy="${toY(v,10)}" r="2.5" fill="var(--accent)"/>`; });
+    }
+    // Schlaf-Qualität (blau, /5)
+    if(schlafVals.some(v=>v>0)){
+      html+=`<polyline points="${polyline(schlafVals,5)}" fill="none" stroke="var(--blue)" stroke-width="1.5" stroke-dasharray="2,3" stroke-linejoin="round" stroke-linecap="round"/>`;
+      schlafVals.forEach((v,i)=>{ if(v>0) html+=`<circle cx="${PAD+i*xStep}" cy="${toY(v,5)}" r="2.5" fill="var(--blue)"/>`; });
+    }
+
+    // X-Achse Labels (nur jeden 2. Tag)
+    days14.forEach((d,i)=>{
+      if(i%2===0){
+        const dd=new Date(d+'T12:00:00');
+        const label=dd.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+        html+=`<text x="${PAD+i*xStep}" y="${H+2}" text-anchor="middle" font-size="7" fill="#555" font-family="monospace">${label}</text>`;
+      }
+    });
+    html+=`</svg>`;
+
+    // Legende
+    html+=`<div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap">
+      <span style="font-size:10px;color:var(--purple);font-family:'DM Mono',monospace">● Mental-Score</span>
+      <span style="font-size:10px;color:var(--accent);font-family:'DM Mono',monospace">-- Energie (1–10)</span>
+      <span style="font-size:10px;color:var(--blue);font-family:'DM Mono',monospace">·· Schlaf (1–5)</span>
+    </div>`;
+  }
+  html+=`</div>`;
+
+  // ── 7-TAGE STREAK ────────────────────────────────────────────────────────
+  const days7=getLast7Days();
+  html+=`<div style="display:flex;gap:4px;margin-bottom:14px;justify-content:space-between">`;
+  days7.forEach(d=>{
+    const score=getMentalScore(d);
+    const filled=score>0;
+    const isToday=d===todayStr();
+    const dd=new Date(d+'T12:00:00');
+    const wday=dd.toLocaleDateString('de-DE',{weekday:'short'});
+    html+=`<div style="flex:1;text-align:center">
+      <div style="width:100%;aspect-ratio:1;border-radius:50%;border:1.5px solid ${filled?'var(--purple)':'var(--border)'};background:${filled?'var(--purple-dim)':'transparent'};display:flex;align-items:center;justify-content:center;font-size:${filled?'14px':'10px'};color:${filled?'var(--purple)':'var(--muted)'};${isToday?'box-shadow:0 0 0 2px var(--purple)':''}">
+        ${filled?'🧠':'·'}
+      </div>
+      <div style="font-size:9px;color:${isToday?'var(--accent)':'var(--muted)'};font-family:'DM Mono',monospace;margin-top:3px">${wday}</div>
+    </div>`;
+  });
+  html+=`</div>`;
+
+  html+=`</div>`; // header wrapper
+
+  // ── TAGES-SEKTIONEN ──────────────────────────────────────────────────────
+  const date=mentalDate;
+  const score=getMentalScore(date);
+  html+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 13px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+    <div style="flex:1">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Mental-Score heute</div>
+      <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--purple)">${score}<span style="font-size:13px;color:var(--muted)">/100</span></div>
+    </div>
+    <div style="width:50px;height:50px">
+      <svg viewBox="0 0 36 36"><path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--border)" stroke-width="3"/>
+      <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--purple)" stroke-width="3" stroke-dasharray="${score},100" stroke-linecap="round"/></svg>
+    </div>
+  </div>`;
+
+  // ── Energie & Schlaf direkt hier (da täglich) ─────────────────────────────
+  const energyVal=parseInt(lv(mmk(date,'energie')))||0;
+  const schlafH=lv(mmk(date,'schlafh'));
+  const schlafQ=parseInt(lv(mmk(date,'schlafq')))||0;
+
+  html+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 13px;margin-bottom:12px">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Körper & Erholung</div>
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:5px"><span>1 = erschöpft</span><span>Energie</span><span>10 = voller Power</span></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">`;
+  for(let i=1;i<=10;i++){
+    html+=`<button onclick="saveMentalScale('${date}','energie',${i})" data-date="${date}" data-field="energie" data-val="${i}"
+      style="width:32px;height:32px;border-radius:50%;border:1px solid ${energyVal===i?'var(--accent)':'var(--border)'};background:${energyVal===i?'var(--accent-dim)':'transparent'};color:${energyVal===i?'var(--accent)':'var(--muted)'};font-family:'DM Mono',monospace;font-size:11px;transition:all .15s">${i}</button>`;
+  }
+  html+=`</div></div>
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:5px"><span>1 = schlecht</span><span>Schlafqualität</span><span>5 = traumhaft</span></div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <input type="number" inputmode="decimal" step="0.5" min="0" max="16" placeholder="h" value="${schlafH}"
+          onchange="sv(mmk('${date}','schlafh'),this.value)"
+          style="width:70px;padding:7px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Mono',monospace;font-size:12px">
+        <span style="font-size:11px;color:var(--muted)">Std.</span>`;
+  for(let i=1;i<=5;i++){
+    html+=`<button onclick="saveMentalScale('${date}','schlafq',${i})"
+      style="width:32px;height:32px;border-radius:50%;border:1px solid ${schlafQ===i?'var(--blue)':'var(--border)'};background:${schlafQ===i?'var(--blue-dim)':'transparent'};color:${schlafQ===i?'var(--blue)':'var(--muted)'};font-family:'DM Mono',monospace;font-size:11px;transition:all .15s">${i}</button>`;
+  }
+  html+=`</div></div></div>`;
+
+  // ── MENTALE SEKTIONEN ─────────────────────────────────────────────────────
   const sections=[
     {id:'morgen',icon:'🌅',title:'Morgens – Intention & Start',fields:[
       {type:'text',key:'fokus',label:'Mein Fokus heute ist…'},
-      {type:'text',key:'ziel1',label:'Ziel 1 heute'},{type:'text',key:'ziel2',label:'Ziel 2 heute'},{type:'text',key:'ziel3',label:'Ziel 3 heute'},
-      {type:'timer',key:'atem_morgen',label:'2 Min. Atemübung',dur:120,timerKey:'atem_morgen'},
+      {type:'text',key:'ziel1',label:'Ziel 1'},{type:'text',key:'ziel2',label:'Ziel 2'},{type:'text',key:'ziel3',label:'Ziel 3'},
+      {type:'timer',key:'atem_morgen',label:'2 Min. Atemübung',dur:120},
       {type:'affirmation',key:'affirmation',label:'Affirmation des Tages'},
     ]},
     {id:'vortraining',icon:'💪',title:'Vor dem Training',fields:[
       {type:'text',key:'warum',label:'Ich trainiere heute, weil…'},
-      {type:'check',key:'powerposen',label:'Power-Pose / Aktivierungsritual (30 Sek. stabil stehen, Schultern zurück, tief atmen)'},
+      {type:'check',key:'powerposen',label:'Power-Pose / Aktivierungsritual (30 Sek.)'},
       {type:'text',key:'vision',label:'Ich sehe mich schon, wie ich…'},
     ]},
     {id:'nachtraining',icon:'🏆',title:'Nach dem Training',fields:[
@@ -1299,11 +1630,11 @@ function renderMental(){
       {type:'text',key:'dank1',label:'Dankbarkeit 1'},{type:'text',key:'dank2',label:'Dankbarkeit 2'},{type:'text',key:'dank3',label:'Dankbarkeit 3'},
       {type:'text',key:'stolz',label:'Was hat mich heute stolz gemacht?'},
       {type:'text',key:'morgen_int',label:'Meine Intention für morgen…'},
-      {type:'timer',key:'atem_abend',label:'5 Min. Abend-Atemübung / Body Scan',dur:300,timerKey:'atem_abend'},
+      {type:'timer',key:'atem_abend',label:'5 Min. Body Scan / Atemübung',dur:300},
+      {type:'meditation',key:'meditation',label:'Meditation'},
     ]},
   ];
 
-  let html='';
   sections.forEach(sec=>{
     html+=`<div class="mental-section">
       <div class="mental-section-header" onclick="toggleMentalSec('${sec.id}')">
@@ -1312,269 +1643,235 @@ function renderMental(){
         <span class="mental-section-toggle" id="menttog-${sec.id}">▾</span>
       </div>
       <div class="mental-body" id="mentbody-${sec.id}">`;
+
     sec.fields.forEach(f=>{
-      const k=mk(f.key);
+      const k=mmk(date,f.key);
       if(f.type==='text'){
         html+=`<div class="mental-item">
           <div class="mental-item-label">${f.label}</div>
-          <input type="text" value="${lv(k)}" placeholder="…" onchange="sv('${k}',this.value)">
+          <input type="text" value="${lv(k).replace(/"/g,'&quot;')}" placeholder="…" onchange="sv('${k}',this.value)">
         </div>`;
-      }else if(f.type==='check'){
+      } else if(f.type==='check'){
         const done=lb(k);
         html+=`<div class="mental-check-row">
-          <button class="mental-check-btn${done?' done':''}" id="mchk-${f.key}" onclick="toggleMentalCheck('${k}','${f.key}')">${done?'✓':'○'}</button>
-          <span style="font-size:13px;color:var(--text)">${f.label}</span>
+          <button class="mental-check-btn${done?' done':''}" id="mchk-${date}-${f.key}" onclick="toggleMentalCheckDate('${k}','${date}','${f.key}')">${done?'✓':'○'}</button>
+          <span style="font-size:13px;color:var(--text);line-height:1.4">${f.label}</span>
         </div>`;
-      }else if(f.type==='timer'){
-        const done=lb(k);
+      } else if(f.type==='timer'){
+        const done=lb(k+'_done');
         html+=`<div class="mental-item">
           <div class="mental-check-row">
-            <button class="mental-check-btn${done?' done':''}" id="mchk-${f.key}" onclick="toggleMentalCheck('${k}','${f.key}')">${done?'✓':'○'}</button>
+            <button class="mental-check-btn${done?' done':''}" id="mchk-${date}-${f.key}" onclick="toggleMentalCheckDate('${k+'_done'}','${date}','${f.key}')">${done?'✓':'○'}</button>
             <span style="font-size:13px;color:var(--text)">${f.label}</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
-            <button class="mental-timer-btn" id="mentimer-${f.timerKey}" onclick="startMentalTimer('${f.timerKey}',${f.dur},'${k}','${f.key}')">▶ Start</button>
-            <span class="mental-timer-disp" id="mentdisp-${f.timerKey}"></span>
+            <button class="mental-timer-btn" id="mentimer-${date}-${f.key}" onclick="startMentalTimerDate('${date}','${f.key}',${f.dur})">▶ Start</button>
+            <span class="mental-timer-disp" id="mentdisp-${date}-${f.key}"></span>
           </div>
         </div>`;
-      }else if(f.type==='affirmation'){
+      } else if(f.type==='meditation'){
+        const done=lb(k+'_done');
+        const minVal=lv(k+'_min');
+        html+=`<div class="mental-item">
+          <div class="mental-item-label">${f.label}</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <button class="mental-check-btn${done?' done':''}" id="mchk-${date}-med" onclick="toggleMentalCheckDate('${k+'_done'}','${date}','med')">${done?'✓':'○'}</button>
+            <input type="number" inputmode="decimal" min="1" max="120" step="1" placeholder="Min." value="${minVal}"
+              onchange="sv('${k+'_min'}',this.value)"
+              style="width:80px;padding:7px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Mono',monospace;font-size:12px">
+            <span style="font-size:12px;color:var(--muted)">Minuten</span>
+          </div>
+        </div>`;
+      } else if(f.type==='affirmation'){
         const saved=lv(k);
         html+=`<div class="mental-item">
           <div class="mental-item-label">${f.label}</div>
           <div class="affirmation-list">`;
-        AFFIRMATIONS.forEach((a,ai)=>{
-          html+=`<button class="affirmation-chip${saved===a?' sel':''}" onclick="selectAffirmation('${k}','${a.replace(/'/g,"\\'")}',this)">${a}</button>`;
+        AFFIRMATIONS.forEach(a=>{
+          html+=`<button class="affirmation-chip${saved===a?' sel':''}" onclick="selectAffirmationDate('${k}',this,'${a.replace(/'/g,"\\'")}')">${a}</button>`;
         });
         html+=`</div>
-          <input type="text" value="${saved}" placeholder="Eigene Affirmation…" onchange="sv('${k}',this.value)">
+          <input type="text" value="${saved.replace(/"/g,'&quot;')}" placeholder="Eigene Affirmation…"
+            onchange="sv('${k}',this.value)" style="margin-top:6px">
         </div>`;
       }
     });
     html+=`</div></div>`;
   });
 
-  // SOS Toolkit
+  // ── SOS TOOLKIT ───────────────────────────────────────────────────────────
   html+=`<div class="sos-section">
     <div class="sos-header" onclick="toggleSOS()">
       <span style="font-size:18px">🆘</span>
       <span class="sos-title">SOS – Stress & Gedankenkarussell</span>
       <span id="sostog" style="margin-left:auto;font-size:16px;color:var(--red)">▾</span>
     </div>
-    <div class="sos-body" id="sosbody">`;
-
-  const sosMk=(f)=>`tp3_sos_${new Date().toISOString().split('T')[0]}_${f}`;
-
-  // 4-7-8 Atem
-  html+=`<div class="sos-item">
-    <div class="sos-item-title">🫁 4-7-8 Atemtechnik</div>
-    <div class="sos-item-desc">4 Sek. einatmen → 7 Sek. halten → 8 Sek. ausatmen. 3 Runden.</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button class="mental-timer-btn" id="mentimer-478" onclick="start478Timer()">▶ Starten</button>
-      <span class="mental-timer-disp" id="mentdisp-478"></span>
-    </div>
-    <div class="sos-log-entry" id="soslog-478"></div>
-  </div>`;
-
-  // 5-4-3-2-1 Grounding
-  const groundDone=lb(sosMk('ground'));
-  html+=`<div class="sos-item">
-    <div class="sos-item-title">🌱 5-4-3-2-1 Grounding</div>
-    <div class="sos-item-desc">5 Dinge sehen · 4 hören · 3 fühlen · 2 riechen · 1 schmecken</div>
-    <div class="mental-check-row" style="margin-top:8px">
-      <button class="mental-check-btn${groundDone?' done':''}" id="mchk-ground" onclick="toggleSOSCheck('${sosMk('ground')}','ground')">${groundDone?'✓':'○'}</button>
-      <span style="font-size:12px;color:var(--muted)">Abgehakt = durchgeführt</span>
-    </div>
-  </div>`;
-
-  // Gedanken-Umformulierung
-  html+=`<div class="sos-item">
-    <div class="sos-item-title">💭 Gedanken-Umformulierung</div>
-    <input type="text" placeholder="Mein Gedanke war…" value="${lv(sosMk('gedanke'))}" onchange="sv('${sosMk('gedanke')}',this.value)" style="margin-bottom:6px">
-    <input type="text" placeholder="Ich wähle stattdessen…" value="${lv(sosMk('umformulierung'))}" onchange="sv('${sosMk('umformulierung')}',this.value)">
-  </div>`;
-
-  // Kurz-Bewegung
-  html+=`<div class="sos-item">
-    <div class="sos-item-title">🏃 Kurz-Bewegung (30 Sek.)</div>
-    <div class="sos-item-desc">Springen, Schütteln, Jumping Jacks – Energie entladen!</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button class="mental-timer-btn" id="mentimer-move" onclick="startMentalTimer('move',30,'${sosMk('move')}','move')">▶ 30 Sek.</button>
-      <span class="mental-timer-disp" id="mentdisp-move"></span>
+    <div class="sos-body" id="sosbody">
+      <div class="sos-item">
+        <div class="sos-item-title">🫁 4-7-8 Atemtechnik</div>
+        <div class="sos-item-desc">4 Sek. einatmen → 7 Sek. halten → 8 Sek. ausatmen. 3 Runden.</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="mental-timer-btn" id="mentimer-478" onclick="start478Timer()">▶ Starten</button>
+          <span class="mental-timer-disp" id="mentdisp-478"></span>
+        </div>
+      </div>
+      <div class="sos-item">
+        <div class="sos-item-title">🌱 5-4-3-2-1 Grounding</div>
+        <div class="sos-item-desc">5 sehen · 4 hören · 3 fühlen · 2 riechen · 1 schmecken</div>
+      </div>
+      <div class="sos-item">
+        <div class="sos-item-title">💭 Gedanken-Umformulierung</div>
+        <input type="text" placeholder="Mein Gedanke war…" style="margin-bottom:6px">
+        <input type="text" placeholder="Ich wähle stattdessen…">
+      </div>
+      <div class="sos-item">
+        <div class="sos-item-title">🏃 Kurz-Bewegung (30 Sek.)</div>
+        <button class="mental-timer-btn" id="mentimer-move" onclick="startMentalTimer('move',30,'','')">▶ 30 Sek.</button>
+        <span class="mental-timer-disp" id="mentdisp-move"></span>
+      </div>
     </div>
   </div>`;
 
-  html+=`</div></div>`;
-  container.innerHTML=html;
+  container.innerHTML = html;
 }
 
-function toggleMentalSec(id){
-  const body=document.getElementById(`mentbody-${id}`);
-  const tog=document.getElementById(`menttog-${id}`);
-  const open=body.classList.toggle('open');
-  tog.classList.toggle('open',open);
-  tog.textContent=open?'▴':'▾';
+function shiftMentalDate(delta){
+  const d=new Date(mentalDate+'T12:00:00');
+  d.setDate(d.getDate()+delta);
+  mentalDate=d.toISOString().split('T')[0];
+  renderMental();
 }
 
-function toggleSOS(){
-  const body=document.getElementById('sosbody');
-  const tog=document.getElementById('sostog');
-  const open=body.classList.toggle('open');
-  tog.textContent=open?'▴':'▾';
+function saveMentalScale(date,field,val){
+  sv(mmk(date,field),val);
+  renderMental(); // re-render to update scale buttons + curve
 }
 
-function toggleMentalCheck(k,btnId){
-  const nv=!lb(k);sb(k,nv);
-  const btn=document.getElementById(`mchk-${btnId}`);
+function toggleMentalCheckDate(k,date,field){
+  const nv=!lb(k); sb(k,nv);
+  const btn=document.getElementById(`mchk-${date}-${field}`);
   if(btn){btn.className='mental-check-btn'+(nv?' done':'');btn.textContent=nv?'✓':'○';}
+  // Update score ring without full re-render
+  const score=getMentalScore(date);
+  renderMental();
 }
 
-function toggleSOSCheck(k,btnId){toggleMentalCheck(k,btnId);}
-
-function selectAffirmation(k,text,el){
+function selectAffirmationDate(k,el,text){
   sv(k,text);
-  // Alle Chips deselektieren, dann diesen selektieren
   el.closest('.affirmation-list').querySelectorAll('.affirmation-chip').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
-  // Auch im Input setzen
   const input=el.closest('.mental-item').querySelector('input[type="text"]');
   if(input)input.value=text;
 }
 
-function startMentalTimer(timerKey,dur,doneKey,btnId){
+function startMentalTimerDate(date,field,dur){
+  const timerKey=`${date}-${field}`;
   if(mentalTimers[timerKey])return;
   let secs=dur;
   const btn=document.getElementById(`mentimer-${timerKey}`);
   const disp=document.getElementById(`mentdisp-${timerKey}`);
   if(btn)btn.classList.add('running');
   mentalTimers[timerKey]=setInterval(()=>{
-    const m=Math.floor(secs/60);const s=secs%60;
+    const m=Math.floor(secs/60),s=secs%60;
     if(disp)disp.textContent=`${m}:${String(s).padStart(2,'0')}`;
     if(secs<=0){
       clearInterval(mentalTimers[timerKey]);delete mentalTimers[timerKey];
       if(btn){btn.classList.remove('running');btn.textContent='✓ Fertig';}
       if(disp)disp.textContent='';
-      sb(doneKey,true);
-      const chk=document.getElementById(`mchk-${btnId}`);
-      if(chk){chk.className='mental-check-btn done';chk.textContent='✓';}
-      if(navigator.vibrate)navigator.vibrate([200,100,200,100,200]);
+      sb(mmk(date,field+'_done'),true);
+      if(navigator.vibrate)navigator.vibrate([200,100,200]);
+      renderMental();
     }
     secs--;
   },1000);
 }
 
-// 4-7-8 Timer mit Führung
+
+// =====================================================
+// MENTALE STÄRKE – FEHLENDE HILFSFUNKTIONEN
+// =====================================================
+
+function toggleMentalSec(id){
+  const body=document.getElementById(`mentbody-${id}`);
+  const tog=document.getElementById(`menttog-${id}`);
+  if(!body||!tog) return;
+  const open=body.classList.toggle('open');
+  tog.classList.toggle('open', open);
+  tog.textContent=open?'▴':'▾';
+}
+
+function toggleSOS(){
+  const body=document.getElementById('sosbody');
+  const tog=document.getElementById('sostog');
+  if(!body||!tog) return;
+  const open=body.classList.toggle('open');
+  tog.textContent=open?'▴':'▾';
+}
+
+function setMentalToday(){
+  mentalDate=todayStr();
+  renderMental();
+}
+
+// 4-7-8 Atemtechnik mit Live-Phasen-Anzeige
 function start478Timer(){
   const btn=document.getElementById('mentimer-478');
   const disp=document.getElementById('mentdisp-478');
-  if(btn.classList.contains('running'))return;
+  if(!btn||btn.classList.contains('running')) return;
   btn.classList.add('running');
+  btn.textContent='läuft…';
   const phases=[
     {label:'Einatmen',dur:4},{label:'Halten',dur:7},{label:'Ausatmen',dur:8},
     {label:'Einatmen',dur:4},{label:'Halten',dur:7},{label:'Ausatmen',dur:8},
     {label:'Einatmen',dur:4},{label:'Halten',dur:7},{label:'Ausatmen',dur:8},
   ];
-  let pi=0,secs=phases[0].dur;
-  if(disp)disp.textContent=phases[0].label+' '+secs;
+  let pi=0, secs=phases[0].dur;
+  if(disp) disp.textContent=phases[0].label+' '+secs;
   const t=setInterval(()=>{
     secs--;
     if(secs<=0){
       pi++;
       if(pi>=phases.length){
-        clearInterval(t);btn.classList.remove('running');btn.textContent='✓ Fertig';
-        if(disp)disp.textContent='';
-        if(navigator.vibrate)navigator.vibrate([300,150,300]);
+        clearInterval(t);
+        btn.classList.remove('running');
+        btn.textContent='✓ Fertig';
+        if(disp) disp.textContent='';
+        if(navigator.vibrate) navigator.vibrate([300,150,300]);
         return;
       }
       secs=phases[pi].dur;
     }
-    if(disp)disp.textContent=phases[pi].label+' '+secs;
+    if(disp) disp.textContent=phases[pi].label+' '+secs;
+  },1000);
+}
+
+// Generischer Mental-Timer (für SOS Kurz-Bewegung etc.)
+function startMentalTimer(timerKey,dur,doneKey,btnId){
+  if(mentalTimers[timerKey]) return;
+  let secs=dur;
+  const btn=document.getElementById(`mentimer-${timerKey}`);
+  const disp=document.getElementById(`mentdisp-${timerKey}`);
+  if(btn) btn.classList.add('running');
+  mentalTimers[timerKey]=setInterval(()=>{
+    const m=Math.floor(secs/60), s=secs%60;
+    if(disp) disp.textContent=`${m}:${String(s).padStart(2,'0')}`;
+    if(secs<=0){
+      clearInterval(mentalTimers[timerKey]);
+      delete mentalTimers[timerKey];
+      if(btn){btn.classList.remove('running');btn.textContent='✓ Fertig';}
+      if(disp) disp.textContent='';
+      if(doneKey) sb(doneKey,true);
+      if(btnId){
+        const chk=document.getElementById(`mchk-${btnId}`);
+        if(chk){chk.className='mental-check-btn done';chk.textContent='✓';}
+      }
+      if(navigator.vibrate) navigator.vibrate([200,100,200,100,200]);
+    }
+    secs--;
   },1000);
 }
 
 
-// =====================================================
-// AUFWÄRMEN – INTERAKTIVE KARTE
-// =====================================================
-
-// State-Keys für Aufwärmen
-const wuCardioDevk = (wi,di) => `tp3_w${wi}d${di}_wu_dev`;
-const wuCardioZeitk = (wi,di) => `tp3_w${wi}d${di}_wu_zeit`;
-const wuCardioDistk = (wi,di) => `tp3_w${wi}d${di}_wu_dist`;
-const wuCardioDonk = (wi,di) => `tp3_w${wi}d${di}_wu_done`;
-const wuExtrak = (wi,di) => `tp3_w${wi}d${di}_wu_extra`;
-
-// Splittet den Warmup-String in Cardio-Teil und Extra-Teil
-function parseWarmup(warmupStr) {
-  // Suche nach " + " als Trenner zwischen Cardio und Extra
-  const plusIdx = warmupStr.indexOf(' + ');
-  if (plusIdx === -1) return { cardio: warmupStr, extra: null };
-  return {
-    cardio: warmupStr.substring(0, plusIdx).trim(),
-    extra: warmupStr.substring(plusIdx + 3).trim()
-  };
-}
-
-function renderWarmupCard(wi, di, warmupStr) {
-  const CARDIO_DEVICES = ['Rudergerät','Laufband','Ski-Erg','Fahrrad / Bike','Crosstrainer','Sonstiges'];
-  const parsed = parseWarmup(warmupStr);
-  const savedDev = lv(wuCardioDevk(wi,di)) || 'Rudergerät';
-  const savedZeit = lv(wuCardioZeitk(wi,di));
-  const savedDist = lv(wuCardioDistk(wi,di));
-  const cardioDone = lb(wuCardioDonk(wi,di));
-  const extraDone = lb(wuExtrak(wi,di));
-
-  let html = `<div class="warmup-card">
-    <div class="warmup-top">
-      <span class="card-label">Aufwärmen</span>
-    </div>`;
-
-  // --- Cardio-Zeile ---
-  html += `<div class="warmup-cardio-row">
-    <select id="wudev-${wi}-${di}" onchange="sv(wuCardioDevk(${wi},${di}),this.value)">
-      ${CARDIO_DEVICES.map(d=>`<option${savedDev===d?' selected':''}>${d}</option>`).join('')}
-    </select>
-    <input type="number" inputmode="decimal" min="0" step="1" placeholder="Min." value="${savedZeit}"
-      id="wuzeit-${wi}-${di}" title="Dauer in Minuten"
-      onchange="sv(wuCardioZeitk(${wi},${di}),this.value)" onfocus="this.select()">
-    <span class="wunit">Min.</span>
-    <input type="number" inputmode="decimal" min="0" step="0.01" placeholder="km" value="${savedDist}"
-      id="wudist-${wi}-${di}" title="Distanz in km"
-      onchange="sv(wuCardioDistk(${wi},${di}),this.value)" onfocus="this.select()">
-    <span class="wunit">km</span>
-    <button class="warmup-cardio-check${cardioDone?' done':''}" id="wucardiobtn-${wi}-${di}"
-      onclick="toggleWuCardio(${wi},${di})">${cardioDone?'✓':'○'}</button>
-  </div>`;
-
-  // --- Extra-Aufwärmübung (falls vorhanden) ---
-  if (parsed.extra) {
-    html += `<div class="warmup-extra-row">
-      <button class="warmup-extra-check${extraDone?' done':''}" id="wuextrabtn-${wi}-${di}"
-        onclick="toggleWuExtra(${wi},${di})">${extraDone?'✓':'○'}</button>
-      <span class="warmup-extra-text">${parsed.extra}</span>
-    </div>`;
-  }
-
-  html += `</div>`;
-  return html;
-}
-
-function toggleWuCardio(wi, di) {
-  const k = wuCardioDonk(wi, di);
-  const nv = !lb(k); sb(k, nv);
-  const btn = document.getElementById(`wucardiobtn-${wi}-${di}`);
-  if (btn) { btn.className = 'warmup-cardio-check' + (nv?' done':''); btn.textContent = nv?'✓':'○'; }
-  checkDayDone(wi, di); updateGlobalProgress();
-}
-
-function toggleWuExtra(wi, di) {
-  const k = wuExtrak(wi, di);
-  const nv = !lb(k); sb(k, nv);
-  const btn = document.getElementById(`wuextrabtn-${wi}-${di}`);
-  if (btn) { btn.className = 'warmup-extra-check' + (nv?' done':''); btn.textContent = nv?'✓':'○'; }
-  checkDayDone(wi, di); updateGlobalProgress();
-}
-
-// =====================================================
 // INIT
 // =====================================================
 renderWeek();
