@@ -3,147 +3,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Trainingsplan Block 1</title>
+<title>Training · Block 1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
-:root {
+/* ===== CSS VARIABLEN ===== */
+:root{
   --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#222;--border:#2e2e2e;
-  --text:#f0ece4;--muted:#666;--accent:#c8f060;--accent-dim:rgba(200,240,96,0.12);
-  --red:#ff6b6b;--blue:#60b4f0;--amber:#f0c060;--pink:#f060b4;
-  --radius:12px;
+  --text:#f0ece4;--muted:#666;--muted2:#888;
+  --accent:#c8f060;--accent-dim:rgba(200,240,96,0.12);--accent-border:rgba(200,240,96,0.3);
+  --red:#ff6b6b;--red-dim:rgba(255,107,107,0.1);--red-border:rgba(255,107,107,0.3);
+  --blue:#60b4f0;--blue-dim:rgba(96,180,240,0.1);
+  --amber:#f0c060;--amber-dim:rgba(240,192,96,0.1);
+  --purple:#b060f0;--purple-dim:rgba(176,96,240,0.1);--purple-border:rgba(176,96,240,0.3);
+  --teal:#60f0d0;--teal-dim:rgba(96,240,208,0.1);
+  --radius:12px;--radius-sm:8px;
 }
+/* ===== RESET ===== */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:90px;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;}
+input,textarea,select{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;width:100%;-webkit-appearance:none;appearance:none;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#555;}
+input::placeholder,textarea::placeholder{color:var(--muted);}
+textarea{resize:vertical;min-height:60px;}
+select option{background:var(--surface2);}
+button{cursor:pointer;font-family:'DM Sans',sans-serif;}
 
-/* HEADER */
-header{padding:16px 16px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(15,15,15,0.96);backdrop-filter:blur(10px);}
+/* ===== HEADER ===== */
+header{padding:14px 16px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(15,15,15,0.96);backdrop-filter:blur(10px);}
 header h1{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;}
 header p{font-size:11px;color:var(--muted);}
 .progress-bar{height:2px;background:var(--border);margin-top:10px;border-radius:2px;overflow:hidden;}
 .progress-bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;width:0%;}
 
-/* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,15,15,0.97);border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom);}
-.bottom-nav button{flex:1;padding:12px 4px 10px;background:transparent;border:none;color:var(--muted);font-size:10px;font-family:'DM Mono',monospace;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s;}
+/* ===== BOTTOM NAV ===== */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,15,15,0.97);border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px);}
+.bottom-nav button{flex:1;padding:10px 2px 8px;background:transparent;border:none;color:var(--muted);font-size:9px;font-family:'DM Mono',monospace;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s;}
 .bottom-nav button.active{color:var(--accent);}
-.bottom-nav button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;}
+.bottom-nav button svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;}
 
-/* VIEWS */
-.view{display:none;padding:0 0 20px;}
+/* ===== VIEWS ===== */
+.view{display:none;}
 .view.active{display:block;}
 
-/* WEEK NAV */
+/* ===== WEEK NAV ===== */
 .week-nav{display:flex;overflow-x:auto;gap:6px;padding:12px 16px;scrollbar-width:none;border-bottom:1px solid var(--border);}
 .week-nav::-webkit-scrollbar{display:none;}
-.week-btn{flex-shrink:0;font-family:'DM Mono',monospace;font-size:11px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap;}
+.week-btn{flex-shrink:0;font-family:'DM Mono',monospace;font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);white-space:nowrap;transition:all .2s;}
 .week-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
 .week-btn.has-zyklus{border-color:var(--red);color:var(--red);}
-.week-btn.has-zyklus.active{background:rgba(255,107,107,.12);}
-.week-btn.wdone{opacity:.5;}
+.week-btn.has-zyklus.active{background:var(--red-dim);}
 
-/* WEEK PANEL */
-.week-panel{display:none;padding:16px;}
+/* ===== WEEK PANEL ===== */
+.week-panel{display:none;padding:14px 16px;}
 .week-panel.active{display:block;}
-.week-title{font-family:'DM Mono',monospace;font-size:17px;font-weight:500;margin-bottom:2px;}
-.week-date{font-size:12px;color:var(--muted);margin-bottom:4px;}
+.week-title{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;margin-bottom:2px;}
+.week-meta{font-size:12px;color:var(--muted);margin-bottom:4px;}
 .week-zyklus{font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:8px;}
-.zyklus-note{padding:8px 12px;background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.25);border-radius:8px;font-size:12px;color:#ff9999;line-height:1.4;margin-bottom:12px;}
+.zyklus-note{padding:8px 12px;background:var(--red-dim);border:1px solid var(--red-border);border-radius:var(--radius-sm);font-size:12px;color:#ff9999;line-height:1.5;margin-bottom:12px;}
+.luteal-note{padding:8px 12px;background:var(--amber-dim);border:1px solid rgba(240,192,96,0.3);border-radius:var(--radius-sm);font-size:12px;color:var(--amber);line-height:1.5;margin-bottom:12px;}
 
-/* DAY TABS */
-.day-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+/* ===== DAY TABS ===== */
+.day-tabs{display:flex;gap:5px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
 .day-tabs::-webkit-scrollbar{display:none;}
-.day-tab{flex-shrink:0;font-size:12px;font-weight:500;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:all .2s;text-align:center;line-height:1.3;}
+.day-tab{flex-shrink:0;font-size:11px;font-weight:500;padding:7px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--muted);text-align:center;line-height:1.3;transition:all .2s;}
 .day-tab.active{background:var(--surface2);border-color:#444;color:var(--text);}
 .day-tab.done{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.day-tab.hiit-tab{border-color:var(--red-border);color:var(--red);}
+.day-tab.hiit-tab.active{background:var(--red-dim);}
 .day-content{display:none;}
 .day-content.active{display:block;}
 
-/* WARMUP */
-.warmup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:11px;font-size:12px;color:var(--muted);line-height:1.5;}
-.warmup-card strong{color:var(--blue);font-size:10px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px;}
+/* ===== DATUMS-HEADER ===== */
+.day-date-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.day-date-label{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--text);}
+.date-input{flex:1;max-width:160px;font-family:'DM Mono',monospace;font-size:12px;padding:6px 10px;color:var(--muted2);border-color:var(--border);}
+.date-input:focus{color:var(--text);}
 
-/* EXERCISE CARD */
+/* ===== WARMUP ===== */
+.warmup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:0;margin-bottom:11px;overflow:hidden;}
+.warmup-top{padding:11px 13px 8px;border-bottom:1px solid var(--border);}
+.warmup-cardio-row{display:flex;align-items:center;gap:8px;padding:10px 13px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+.warmup-cardio-row select{flex:1;min-width:0;font-size:12px;padding:7px 9px;background:var(--surface2);}
+.warmup-cardio-row input{width:72px;flex:0 0 72px;font-size:12px;padding:7px 9px;text-align:right;}
+.warmup-cardio-row .wunit{font-size:11px;color:var(--muted);flex-shrink:0;}
+.warmup-cardio-check{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--blue-dim);background:transparent;color:var(--blue);font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.warmup-cardio-check:active{transform:scale(.88);}
+.warmup-cardio-check.done{background:var(--blue-dim);border-color:var(--blue);}
+.warmup-extra-row{display:flex;align-items:center;gap:10px;padding:9px 13px;}
+.warmup-extra-check{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.warmup-extra-check:active{transform:scale(.88);}
+.warmup-extra-check.done{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.warmup-extra-text{font-size:12px;color:var(--muted);flex:1;line-height:1.4;}
+.card-label{color:var(--blue);font-size:10px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px;}
+
+/* ===== EXERCISE CARD ===== */
 .exercise-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:9px;overflow:hidden;transition:border-color .2s;}
 .exercise-card.completed{border-color:var(--accent);}
-.exercise-header{display:flex;align-items:flex-start;gap:9px;padding:11px 13px 8px;}
-.pattern-chip{font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.08em;padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;}
-.chip-compound{background:rgba(200,240,96,.15);color:var(--accent);border:1px solid rgba(200,240,96,.3);}
+.exercise-header{display:flex;align-items:flex-start;gap:9px;padding:11px 13px 6px;}
+.pattern-chip{font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;}
+.chip-compound{background:rgba(200,240,96,.15);color:var(--accent);border:1px solid var(--accent-border);}
 .chip-accessory{background:rgba(102,102,102,.2);color:#888;border:1px solid var(--border);}
 .exercise-info{flex:1;}
 .exercise-name{font-size:14px;font-weight:500;color:var(--text);line-height:1.2;margin-bottom:2px;}
 .exercise-detail{font-size:11px;color:var(--muted);line-height:1.3;}
+.progress-indicator{font-size:10px;color:var(--accent);font-family:'DM Mono',monospace;margin-top:3px;}
 
-/* SETS WITH WEIGHT */
-.sets-container{padding:0 13px 12px;}
-.set-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.set-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-user-select:none;user-select:none;}
-.set-btn:active{transform:scale(.9);}
-.set-btn.done{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);font-size:16px;}
-.set-label-mini{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);flex-shrink:0;width:22px;}
-.weight-input-wrap{flex:1;display:flex;align-items:center;gap:5px;}
-.weight-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:8px 10px;text-align:right;min-width:0;-webkit-appearance:none;appearance:none;}
-.weight-input:focus{outline:none;border-color:#555;}
-.weight-input::placeholder{color:var(--muted);}
+/* ===== SETS ===== */
+.sets-container{padding:0 13px 10px;}
+.set-row{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.set-btn{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;transition:all .15s;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-user-select:none;user-select:none;}
+.set-btn:active{transform:scale(.88);}
+.set-btn.done{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);font-size:15px;}
+.set-label-mini{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);flex-shrink:0;width:20px;}
+.weight-wrap{flex:1;display:flex;align-items:center;gap:5px;}
+.weight-input{flex:0 0 70px;text-align:right;font-family:'DM Mono',monospace;font-size:13px;padding:7px 8px;}
 .weight-unit{font-size:11px;color:var(--muted);flex-shrink:0;}
-.weight-note{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;padding:8px 10px;min-width:0;-webkit-appearance:none;appearance:none;}
-.weight-note:focus{outline:none;border-color:#555;}
-.weight-note::placeholder{color:var(--muted);}
+.weight-note{flex:1;font-size:12px;padding:7px 9px;}
 
-/* FINISHER */
-.finisher-card{background:rgba(200,240,96,.06);border:1px solid rgba(200,240,96,.2);border-radius:var(--radius);padding:11px 13px;margin-top:4px;display:flex;align-items:center;gap:10px;}
+/* ===== FINISHER ===== */
+.finisher-card{background:rgba(200,240,96,.06);border:1px solid var(--accent-border);border-radius:var(--radius);padding:11px 13px;margin-top:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.finisher-info{flex:1;min-width:0;}
 .finisher-card .flabel{font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:3px;}
-.finisher-card .fname{font-size:13px;font-weight:500;color:var(--text);}
-.finisher-check{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(200,240,96,.3);background:transparent;color:var(--accent);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-left:auto;}
+.finisher-card .fname{font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px;}
+.finisher-fields{display:flex;gap:6px;width:100%;margin-top:4px;}
+.finisher-fields input{font-size:12px;padding:6px 8px;}
+.finisher-check{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--accent-border);background:transparent;color:var(--accent);font-size:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-left:auto;}
 .finisher-check.done{background:var(--accent-dim);border-color:var(--accent);}
 .finisher-check:active{transform:scale(.9);}
 
-/* DONE BANNER */
-.day-done-banner{display:none;background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--radius);padding:13px;margin-top:11px;text-align:center;font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);letter-spacing:.05em;}
+/* ===== STRETCHING ===== */
+.stretch-section{margin-top:14px;background:var(--teal-dim);border:1px solid rgba(96,240,208,0.2);border-radius:var(--radius);overflow:hidden;}
+.stretch-header{padding:10px 13px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.stretch-header-label{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--teal);}
+.stretch-toggle{font-size:18px;color:var(--teal);transition:transform .2s;}
+.stretch-toggle.open{transform:rotate(180deg);}
+.stretch-body{display:none;padding:0 13px 12px;}
+.stretch-body.open{display:block;}
+.stretch-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(96,240,208,0.1);}
+.stretch-item:last-child{border-bottom:none;}
+.stretch-check{width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(96,240,208,0.3);background:transparent;color:var(--teal);font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.stretch-check:active{transform:scale(.88);}
+.stretch-check.done{background:var(--teal-dim);border-color:var(--teal);}
+.stretch-info{flex:1;}
+.stretch-name{font-size:13px;font-weight:500;color:var(--text);}
+.stretch-dur{font-size:11px;color:var(--muted);}
+
+/* ===== DONE BANNER ===== */
+.day-done-banner{display:none;background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--radius);padding:12px;margin-top:12px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:.05em;}
 .day-done-banner.show{display:block;}
-.reset-btn{display:block;width:100%;margin-top:9px;padding:10px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;text-align:center;}
-.reset-btn:active{opacity:.6;}
-.nav-arrows{display:flex;gap:8px;margin-top:18px;}
-.nav-arrows button{flex:1;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;}
+.reset-btn{display:block;width:100%;margin-top:8px;padding:9px;background:transparent;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;text-align:center;}
+.nav-arrows{display:flex;gap:8px;margin-top:16px;}
+.nav-arrows button{flex:1;padding:11px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;}
 .nav-arrows button.primary{border-color:#444;color:var(--text);}
 .nav-arrows button:disabled{opacity:.3;}
 
-/* LOGBUCH */
-#view-log{padding:16px;}
+/* ===== HIIT TAB ===== */
+.hiit-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;}
+.hiit-note-optional{padding:8px 12px;background:var(--amber-dim);border:1px solid rgba(240,192,96,0.25);border-radius:var(--radius-sm);font-size:12px;color:var(--amber);margin-bottom:12px;line-height:1.4;}
+.hiit-device-row{display:flex;gap:8px;margin-bottom:14px;align-items:center;}
+.hiit-device-row label{font-size:12px;color:var(--muted);flex-shrink:0;}
+.hiit-device-row select{flex:1;font-size:12px;padding:7px 10px;}
+.hiit-round{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;}
+.hiit-round-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.hiit-round-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--red);font-weight:500;}
+.hiit-timer-btn{padding:7px 14px;border-radius:20px;border:1px solid var(--red-border);background:transparent;color:var(--red);font-family:'DM Mono',monospace;font-size:12px;transition:all .2s;}
+.hiit-timer-btn.running{background:var(--red-dim);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.hiit-timer-display{font-family:'DM Mono',monospace;font-size:18px;color:var(--red);margin-left:auto;}
+.hiit-round-fields{display:flex;gap:6px;margin-top:8px;}
+.hiit-round-fields input{font-size:12px;padding:6px 9px;}
+.hiit-round-check{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--red-border);background:transparent;color:var(--red);font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;margin-left:auto;}
+.hiit-round-check.done{background:var(--red-dim);border-color:var(--red);}
+
+/* ===== FREIE TAGE ===== */
+.free-days-section{margin-top:14px;border-top:1px solid var(--border);padding-top:14px;}
+.free-days-title{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;}
+.free-day-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;}
+.free-day-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.free-day-label{font-size:12px;font-weight:500;color:var(--muted2);}
+.free-day-fields{display:flex;flex-direction:column;gap:7px;}
+.free-day-row{display:flex;gap:7px;}
+.free-day-row select,.free-day-row input{font-size:12px;padding:7px 9px;}
+
+/* ===== TAGES-LOG ===== */
+.tageslog-section{margin-top:14px;}
+.tageslog-toggle-btn{width:100%;padding:10px 13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;text-align:left;display:flex;justify-content:space-between;align-items:center;}
+.tageslog-body{display:none;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:12px;}
+.tageslog-body.open{display:block;}
+.tl-section{margin-bottom:14px;}
+.tl-label{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px;display:block;}
+.tl-label-editable{border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.07em;padding:0;width:100%;margin-bottom:6px;}
+.tl-label-editable:focus{outline:none;color:var(--accent);}
+.scale-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}
+.scale-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;transition:all .15s;}
+.scale-btn.sel{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.sleep-row{display:flex;gap:8px;align-items:center;}
+.sleep-row input{flex:0 0 80px;}
+.sleep-row span{font-size:12px;color:var(--muted);}
+
+/* ===== LOGBUCH VIEW ===== */
+#view-log{padding:14px 16px;}
 .log-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .log-header h2{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;}
-.export-btn{font-family:'DM Mono',monospace;font-size:11px;padding:7px 14px;border-radius:20px;border:1px solid var(--accent);background:var(--accent-dim);color:var(--accent);cursor:pointer;}
-.log-empty{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px;line-height:1.6;}
+.export-btn{font-family:'DM Mono',monospace;font-size:11px;padding:6px 13px;border-radius:20px;border:1px solid var(--accent);background:var(--accent-dim);color:var(--accent);}
+.log-empty{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px;line-height:1.7;}
 .log-week{margin-bottom:20px;}
-.log-week-title{font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.log-week-title{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 .log-day{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;}
-.log-day-header{padding:10px 13px;background:var(--surface2);font-size:13px;font-weight:500;display:flex;justify-content:space-between;align-items:center;}
-.log-day-date{font-size:11px;color:var(--muted);}
-.log-exercise{padding:8px 13px;border-top:1px solid var(--border);}
+.log-day-header{padding:9px 13px;background:var(--surface2);font-size:13px;font-weight:500;display:flex;justify-content:space-between;align-items:center;}
+.log-day-pct{font-size:11px;color:var(--muted);}
+.log-exercise{padding:7px 13px;border-top:1px solid var(--border);}
 .log-ex-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;}
 .log-sets{display:flex;flex-wrap:wrap;gap:5px;}
-.log-set-pill{font-family:'DM Mono',monospace;font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--border);color:var(--muted);}
+.log-set-pill{font-family:'DM Mono',monospace;font-size:11px;padding:3px 8px;border-radius:20px;border:1px solid var(--border);color:var(--muted);}
 .log-set-pill.has-weight{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
-.log-set-pill.done-no-weight{border-color:#444;color:#888;}
+.log-set-pill.done-only{border-color:#444;color:#888;}
 
-/* PRINT / PDF styles */
+/* ===== MENTAL VIEW ===== */
+#view-mental{padding:14px 16px;}
+.mental-header{margin-bottom:16px;}
+.mental-header h2{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--purple);}
+.mental-header p{font-size:12px;color:var(--muted);margin-top:3px;}
+.mental-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
+.mental-section-header{padding:12px 14px;background:var(--surface2);display:flex;align-items:center;gap:8px;cursor:pointer;}
+.mental-section-icon{font-size:16px;}
+.mental-section-title{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--text);}
+.mental-section-toggle{margin-left:auto;font-size:16px;color:var(--muted);transition:transform .2s;}
+.mental-section-toggle.open{transform:rotate(180deg);}
+.mental-body{display:none;padding:14px;}
+.mental-body.open{display:block;}
+.mental-item{margin-bottom:14px;}
+.mental-item-label{font-size:12px;color:var(--muted);margin-bottom:5px;line-height:1.4;}
+.mental-check-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.mental-check-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--purple-border);background:transparent;color:var(--purple);font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.mental-check-btn:active{transform:scale(.88);}
+.mental-check-btn.done{background:var(--purple-dim);border-color:var(--purple);}
+.mental-timer-btn{padding:7px 14px;border-radius:20px;border:1px solid var(--purple-border);background:transparent;color:var(--purple);font-family:'DM Mono',monospace;font-size:12px;}
+.mental-timer-btn.running{background:var(--purple-dim);}
+.mental-timer-disp{font-family:'DM Mono',monospace;font-size:16px;color:var(--purple);margin-left:8px;}
+.affirmation-list{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.affirmation-chip{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .2s;}
+.affirmation-chip.sel{border-color:var(--purple);color:var(--purple);background:var(--purple-dim);}
+/* SOS */
+.sos-section{background:var(--red-dim);border:1px solid var(--red-border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
+.sos-header{padding:12px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;}
+.sos-title{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--red);}
+.sos-body{display:none;padding:14px;}
+.sos-body.open{display:block;}
+.sos-item{background:rgba(255,107,107,0.06);border:1px solid var(--red-border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;}
+.sos-item-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px;}
+.sos-item-desc{font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5;}
+.sos-log-entry{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:6px;}
+
+/* ===== PRINT ===== */
 @media print{
   body{background:#fff;color:#000;padding-bottom:0;}
-  header,#view-plan,#view-log .log-header .export-btn,.bottom-nav,.nav-arrows,.reset-btn{display:none!important;}
+  header,.bottom-nav,.nav-arrows,.reset-btn,.export-btn,#view-plan,#view-mental{display:none!important;}
   #view-log{display:block!important;padding:0;}
-  .log-week-title{color:#333;border-bottom:1px solid #ccc;}
-  .log-day{border:1px solid #ccc;background:#fff;}
+  .log-week-title,.log-ex-name{color:#333;}
+  .log-day,.log-exercise{border-color:#ccc;}
   .log-day-header{background:#f5f5f5;}
   .log-set-pill{border-color:#ccc;color:#333;}
-  .log-set-pill.has-weight{border-color:#333;color:#333;background:#f0f0f0;}
-  .log-exercise{border-top:1px solid #eee;}
+  .log-set-pill.has-weight{background:#f0f0f0;}
 }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Trainingsplan · Block 1 · 9 Wochen</h1>
-  <p id="global-progress-text">Lade...</p>
+  <h1>Training · Block 1 · 9 Wochen</h1>
+  <p id="global-progress-text">Lade…</p>
   <div class="progress-bar"><div class="progress-bar-fill" id="global-bar"></div></div>
 </header>
 
@@ -157,9 +286,18 @@ header p{font-size:11px;color:var(--muted);}
 <div class="view" id="view-log">
   <div class="log-header">
     <h2>Logbuch</h2>
-    <button class="export-btn" onclick="printLog()">Als PDF speichern</button>
+    <button class="export-btn" onclick="printLog()">Als PDF</button>
   </div>
   <div id="log-content"></div>
+</div>
+
+<!-- MENTAL VIEW -->
+<div class="view" id="view-mental">
+  <div class="mental-header">
+    <h2>⚡ Mentale Stärke</h2>
+    <p>Trainiere deinen Geist wie einen Muskel – täglich, konsequent.</p>
+  </div>
+  <div id="mental-content"></div>
 </div>
 
 <!-- BOTTOM NAV -->
@@ -168,6 +306,10 @@ header p{font-size:11px;color:var(--muted);}
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Training
   </button>
+  <button id="nav-mental" onclick="switchView('mental')">
+    <svg viewBox="0 0 24 24"><path d="M12 2C8 2 5 5 5 9c0 2.4 1.1 4.5 2.8 5.9L7 18h10l-.8-3.1C17.9 13.5 19 11.4 19 9c0-4-3-7-7-7z"/><path d="M9 21h6"/></svg>
+    Mental
+  </button>
   <button id="nav-log" onclick="switchView('log')">
     <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
     Logbuch
@@ -175,91 +317,552 @@ header p{font-size:11px;color:var(--muted);}
 </nav>
 
 <script>
-const DATA=[{week:1,dates:"11.–17. Mai 2026",zyklus:"Menstruation (Tag 4–10) → Ausleitung + Follikelphase beginnt",zyklusNote:"Leichte Woche – Tag 1 war 08.05. Intensität moderat halten.",days:[{label:"Tag A",sub:"Montag",warmup:"10 min Rudern ~2,1 km + 5 min Balance: Einbeinstand auf Matte (je 45 Sek.)",exercises:[{pat:"Squat",compound:true,name:"Goblet Squat",detail:"3 × 12 · langsam, Fokus Kniestabilität",sets:3},{pat:"Pull-V",compound:true,name:"Lat Pulldown (neutraler Griff)",detail:"3 × 12 · symmetrisch beidseits",sets:3},{pat:"Hinge",compound:false,name:"Romanian Deadlift (RDL)",detail:"3 × 12 · Beckenkipp bewusst, Rücken neutral",sets:3},{pat:"Push-V",compound:false,name:"DB Press sitzend",detail:"3 × 12 · kontrolliert",sets:3},{pat:"Anti-Rot",compound:false,name:"Dead Bug",detail:"3 × 10 je Seite · langsam",sets:3}],finisher:"Farmer's Carry · 3 × 25 m"},{label:"Tag B",sub:"Dienstag",warmup:"10 min Rudern ~2,1 km + dynamisches Aufwärmen: Hüftkreise, Leg Swings",exercises:[{pat:"Push-H",compound:true,name:"Barbell Bench Press (flach)",detail:"3 × 12 · mittlerer Griff, Schulterblätter retrahiert",sets:3},{pat:"Hinge",compound:true,name:"Barbell Hip Thrust",detail:"3 × 12 · Beckenneutralität, beidseits",sets:3},{pat:"Lunge",compound:false,name:"Reverse Lunge",detail:"3 × 10 je Seite · kontrolliertes Absenken",sets:3},{pat:"Pull-H",compound:false,name:"Face Pull",detail:"3 × 15 · externe Rotation betonen",sets:3},{pat:"Rotation",compound:false,name:"Half-kneeling Chop",detail:"3 × 10 je Seite · stabile Basis",sets:3},{pat:"Anti-Rot",compound:false,name:"Pallof Iso Hold",detail:"3 × 20 Sek. je Seite",sets:3}],finisher:"Suitcase Carry · 3 × 20 m je Seite"},{label:"Tag C",sub:"Donnerstag",warmup:"10 min Rudern ~2,1 km + 3 min Treppenspringen (moderat)",exercises:[{pat:"Lunge",compound:true,name:"Reverse Lunge (KB)",detail:"3 × 10 je Seite · aufrecht, Oberkörper stabil",sets:3},{pat:"Pull-H",compound:true,name:"Chest-supported DB Row",detail:"3 × 12 · beidseits symmetrisch",sets:3},{pat:"Squat",compound:false,name:"Heels-elevated Squat (Goblet)",detail:"3 × 12 · Kniestabilität",sets:3},{pat:"Push-H",compound:false,name:"DB Fly (flach)",detail:"3 × 12 · weite Dehnung",sets:3},{pat:"Pull-V",compound:false,name:"Straight-arm Pulldown",detail:"3 × 12 · Lat-Kontraktion betonen",sets:3},{pat:"Rotation",compound:false,name:"Banded Standing Rotation",detail:"3 × 12 je Seite",sets:3}],finisher:"Front-rack Carry (KB) · 3 × 20 m"},{label:"Tag D",sub:"Freitag",warmup:"10 min Rudern ~2,1 km + Schulterkreisen, Katze-Kuh (5 Wdh.)",exercises:[{pat:"Push-V",compound:true,name:"DB Press stehend",detail:"3 × 12 · Rumpf angespannt, kein Hohlkreuz",sets:3},{pat:"Hinge",compound:true,name:"Trap Bar Deadlift",detail:"3 × 10 · neutrale Wirbelsäule, symmetrisch",sets:3},{pat:"Pull-V",compound:false,name:"Chin-up (assistiert)",detail:"3 × 8 · voller Bewegungsumfang",sets:3},{pat:"Pull-H",compound:false,name:"Rear Delt Fly (DB)",detail:"3 × 15",sets:3}],finisher:"Overhead Carry · 3 × 15 m je Seite"}]},{week:2,dates:"18.–24. Mai 2026",zyklus:"Follikelphase (Tag 11–17) → steigende Energie, Kraft gut abrufbar",zyklusNote:null,days:[{label:"Tag A",sub:"Montag",warmup:"10 min Rudern ~2,1 km + Balance: Einbeinstand mit leichter KB (je 45 Sek.)",exercises:[{pat:"Squat",compound:true,name:"Front Squat",detail:"3 × 10 · aufrechter Rumpf, Ellbogen hoch",sets:3},{pat:"Pull-V",compound:true,name:"Pull-up (assistiert)",detail:"3 × 8 · voller ROM, symmetrisch",sets:3},{pat:"Hinge",compound:false,name:"Single-leg RDL (KB)",detail:"3 × 10 je Seite · Hüftstabilität",sets:3},{pat:"Push-V",compound:false,name:"Lateral Raise",detail:"3 × 15",sets:3},{pat:"Anti-Rot",compound:false,name:"Bird Dog",detail:"3 × 10 je Seite · Lendenwirbel stabil",sets:3}],finisher:"Farmer's Carry · 3 × 25 m"},{label:"Tag B",sub:"Dienstag",warmup:"10 min Rudern ~2,1 km + Ausfallschritte mit Rotation",exercises:[{pat:"Push-H",compound:true,name:"Incline Bench Press (BB)",detail:"3 × 10 · Oberbrust betonen",sets:3},{pat:"Hinge",compound:true,name:"Kettlebell Swing",detail:"3 × 15 · explosiv, Hüftstoß",sets:3},{pat:"Lunge",compound:false,name:"Walking Lunge (KB)",detail:"3 × 10 je Seite",sets:3},{pat:"Pull-H",compound:false,name:"Banded Pull-apart",detail:"3 × 20",sets:3},{pat:"Rotation",compound:false,name:"Tall-kneeling Chop",detail:"3 × 10 je Seite",sets:3},{pat:"Anti-Rot",compound:false,name:"Plank with Shoulder Tap",detail:"3 × 12 je Seite",sets:3}],finisher:"Suitcase Carry · 3 × 25 m je Seite"},{label:"Tag C",sub:"Donnerstag",warmup:"10 min Rudern ~2,1 km + Treppenspringen 4 min",exercises:[{pat:"Lunge",compound:true,name:"Bulgarian Split Squat (KB)",detail:"3 × 10 je Seite · Oberkörper aufrecht",sets:3},{pat:"Pull-H",compound:true,name:"Single-arm DB Row",detail:"3 × 12 je Seite · Rumpf nicht rotieren",sets:3},{pat:"Squat",compound:false,name:"Wall Sit",detail:"3 × 40 Sek.",sets:3},{pat:"Push-H",compound:false,name:"Push-up (gewichtet)",detail:"3 × 12",sets:3},{pat:"Pull-V",compound:false,name:"Scapular Pull-up",detail:"3 × 10 · Schulterblatt-Kontrolle",sets:3},{pat:"Rotation",compound:false,name:"Cable Wood Chop (high–low)",detail:"3 × 12 je Seite",sets:3}],finisher:"Front-rack Carry (KB) · 3 × 25 m"},{label:"Tag D",sub:"Freitag",warmup:"10 min Rudern ~2,1 km + Mobilität: Thorax-Rotation (je 8 Wdh.)",exercises:[{pat:"Push-V",compound:true,name:"Z-Press (BB)",detail:"3 × 10 · kein Hohlkreuz, Rumpf aktiv",sets:3},{pat:"Hinge",compound:true,name:"Conventional Deadlift",detail:"3 × 8 · Rücken neutral, Brust raus",sets:3},{pat:"Pull-V",compound:false,name:"Lat Pulldown (weiter Griff)",detail:"3 × 12",sets:3},{pat:"Pull-H",compound:false,name:"Single-arm Cable Row",detail:"3 × 12 je Seite",sets:3}],finisher:"Trap Bar Carry · 3 × 20 m"}]},{week:3,dates:"25.–31. Mai 2026",zyklus:"Ovulationsphase (Tag 18–21) → Energie-Peak, höchste Kraft abrufbar",zyklusNote:null,days:[{label:"Tag A",sub:"Montag",warmup:"10 min Rudern ~2,1 km + Balance: Einbeinstand KB Overhead (je 30 Sek.)",exercises:[{pat:"Squat",compound:true,name:"Back Squat",detail:"3 × 10 · etwas schwerer als Wo.2, Tempo 3-1-1",sets:3},{pat:"Pull-V",compound:true,name:"Weighted Pull-up",detail:"3 × 6–8 · kleines Zusatzgewicht",sets:3},{pat:"Hinge",compound:false,name:"B-stance RDL",detail:"3 × 10 je Seite",sets:3},{pat:"Push-V",compound:false,name:"Arnold Press",detail:"3 × 12",sets:3},{pat:"Anti-Rot",compound:false,name:"Stir-the-pot",detail:"3 × 10 je Richtung",sets:3}],finisher:"Farmer's Carry · 3 × 30 m"},{label:"Tag B",sub:"Dienstag",warmup:"10 min Rudern ~2,1 km + Ausfallschritte mit Rotation, Jumping Jacks",exercises:[{pat:"Push-H",compound:true,name:"Flat DB Press",detail:"3 × 10 · Peak-Woche: etwas schwerer",sets:3},{pat:"Hinge",compound:true,name:"RDL (BB)",detail:"3 × 10 · Hüftscharnier präzise",sets:3},{pat:"Lunge",compound:false,name:"Lateral Lunge (KB)",detail:"3 × 10 je Seite",sets:3},{pat:"Pull-H",compound:false,name:"Face Pull",detail:"3 × 15",sets:3},{pat:"Rotation",compound:false,name:"Rotational Ball Throw (Wand)",detail:"3 × 10 je Seite · explosiv",sets:3},{pat:"Anti-Rot",compound:false,name:"Renegade Row",detail:"3 × 8 je Seite",sets:3}],finisher:"Sled Push · 3 × 20 m"},{label:"Tag C",sub:"Donnerstag",warmup:"10 min Rudern ~2,1 km + Treppenspringen 5 min",exercises:[{pat:"Lunge",compound:true,name:"Front-foot elevated Split Squat",detail:"3 × 10 je Seite · tiefe Dehnung",sets:3},{pat:"Pull-H",compound:true,name:"T-bar Row",detail:"3 × 10 · breiter Griff, Brust zum Griff",sets:3},{pat:"Squat",compound:false,name:"Hack Squat (Maschine)",detail:"3 × 12",sets:3},{pat:"Push-H",compound:false,name:"Cable Fly",detail:"3 × 12",sets:3},{pat:"Pull-V",compound:false,name:"Cable Pullover (DB)",detail:"3 × 12",sets:3},{pat:"Rotation",compound:false,name:"Cable Lift (low–high)",detail:"3 × 12 je Seite",sets:3}],finisher:"Overhead Carry · 3 × 15 m je Seite"},{label:"Tag D",sub:"Freitag",warmup:"10 min Rudern ~2,1 km + Schulter-Mobilität",exercises:[{pat:"Push-V",compound:true,name:"Push Press",detail:"3 × 8 · explosive Hüfte → Druck",sets:3},{pat:"Hinge",compound:true,name:"Sumo Deadlift",detail:"3 × 8 · breitere Basis – symmetrisch",sets:3},{pat:"Pull-V",compound:false,name:"Neutral-grip Pull-up",detail:"3 × 8",sets:3},{pat:"Pull-H",compound:false,name:"High Row (Kabel, Ellbogen weit)",detail:"3 × 12",sets:3}],finisher:"Kettlebell Rack Walk · 3 × 20 m je Seite"}]},{week:4,dates:"1.–7. Juni 2026",zyklus:"Lutealphase (Tag 22–28) → Kraft bleibt hoch, Volumen moderat",zyklusNote:null,days:[{label:"Tag A",sub:"Montag",warmup:"10 min Rudern ~2,1 km + Balance + Hüftmobilität",exercises:[{pat:"Squat",compound:true,name:"Box Squat (BB)",detail:"3 × 10 · Pause auf der Box, explosiv hoch",sets:3},{pat:"Pull-V",compound:true,name:"Lat Pulldown (enger Griff)",detail:"3 × 12",sets:3},{pat:"Hinge",compound:false,name:"Nordic Hamstring Curl",detail:"3 × 6 · exzentrisch langsam",sets:3},{pat:"Push-V",compound:false,name:"Y-raise",detail:"3 × 15 · Skapula-Kontrolle",sets:3},{pat:"Anti-Rot",compound:false,name:"Dead Bug",detail:"3 × 10 je Seite",sets:3}],finisher:"Farmer's Carry · 3 × 30 m"},{label:"Tag B",sub:"Dienstag",warmup:"10 min Rudern ~2,1 km + dynamisches Aufwärmen",exercises:[{pat:"Push-H",compound:true,name:"Close-grip Bench Press",detail:"3 × 10 · Trizeps & innere Brust",sets:3},{pat:"Hinge",compound:true,name:"Single-leg Hip Thrust (KB)",detail:"3 × 10 je Seite",sets:3},{pat:"Lunge",compound:false,name:"Step-up (BB)",detail:"3 × 10 je Seite",sets:3},{pat:"Pull-H",compound:false,name:"Rear Delt Fly (Kabel)",detail:"3 × 15",sets:3},{pat:"Rotation",compound:false,name:"Half-kneeling Chop",detail:"3 × 10 je Seite",sets:3},{pat:"Anti-Rot",compound:false,name:"Bird Dog Row",detail:"3 × 8 je Seite",sets:3}],finisher:"Suitcase Carry · 3 × 25 m je Seite"},{label:"Tag C",sub:"Donnerstag",warmup:"10 min Rudern ~2,1 km + Treppenspringen 4 min",exercises:[{pat:"Lunge",compound:true,name:"Pistol Squat (assistiert)",detail:"3 × 8 je Seite · TRX-Unterstützung ok",sets:3},{pat:"Pull-H",compound:true,name:"Barbell Bent-over Row",detail:"3 × 10 · Rücken parallel, Ellbogen zurück",sets:3},{pat:"Squat",compound:false,name:"Leg Press",detail:"3 × 12 · gleichmäßige Fußposition",sets:3},{pat:"Push-H",compound:false,name:"Incline DB Fly",detail:"3 × 12",sets:3},{pat:"Pull-V",compound:false,name:"Banded Lat Pulldown",detail:"3 × 15",sets:3},{pat:"Rotation",compound:false,name:"Lying Windshield Wiper",detail:"3 × 10 je Seite · Lenden stabil",sets:3}],finisher:"Front-rack Carry (KB) · 3 × 25 m"},{label:"Tag D",sub:"Freitag",warmup:"10 min Rudern ~2,1 km + Mobilität Brustwirbelsäule",exercises:[{pat:"Push-V",compound:true,name:"Half-kneeling Single-arm Press",detail:"3 × 10 je Seite · Lateralflexion vermeiden",sets:3},{pat:"Hinge",compound:true,name:"Good Morning (leicht)",detail:"3 × 10 · Rückenstrecker aktiv, langsam",sets:3},{pat:"Pull-V",compound:false,name:"Single-arm Lat Pulldown",detail:"3 × 12 je Seite",sets:3},{pat:"Pull-H",compound:false,name:"Inverted Row (TRX)",detail:"3 × 12",sets:3}],finisher:"Overhead Carry · 3 × 20 m je Seite"}]},{week:5,dates:"8.–14. Juni 2026",zyklus:"Menstruation (Tag 1–5) → leichte Woche",zyklusNote:"Leichte Woche – Periode ca. 05.06. Intensität reduziert, Fokus auf Technik & Core.",days:[{label:"Tag A",sub:"Montag",warmup:"10 min Rudern ~2,1 km + sanfte Hüftmobilität",exercises:[{pat:"Squat",compound:true,name:"Goblet Squat (leichter)",detail:"3 × 12 · Tempo langsam",sets:3},{pat:"Pull-V",compound:true,name:"Lat Pulldown (neutral)",detail:"3 × 12 · moderat",sets:3},{pat:"Hinge",compound:false,name:"Glute Bridge (beidbeinig)",detail:"3 × 15 · sanft",sets:3},{pat:"Anti-Rot",compound:false,name:"Dead Bug",detail:"3 × 10 je Seite",sets:3},{pat:"Push-V",compound:false,name:"Lateral Raise",detail:"3 × 15 · leicht",sets:3}],finisher:"Farmer's Carry · 2 × 20 m (leichter)"},{label:"Tag B",sub:"Dienstag",warmup:"10 min Rudern ~2,1 km (ruhiges Tempo)",exercises:[{pat:"Push-H",compound:true,name:"Push-up",detail:"3 × 15 · Körpergewicht",sets:3},{pat:"Hinge",compound:true,name:"KB Deadlift (leicht)",detail:"3 × 12 · Fokus Technik",sets:3},{pat:"Lunge",compound:false,name:"Reverse Lunge (KG)",detail:"3 × 10 je Seite",sets:3},{pat:"Pull-H",compound:false,name:"Face Pull",detail:"3 × 15",sets:3},{pat:"Anti-Rot",compound:false,name:"Bird Dog",detail:"3 × 10 je Seite",sets:3}],finisher:"Suitcase Carry · 2 × 20 m"},{label:"Tag C",sub:"Donnerstag",warmup:"10 min Rudern ~2,1 km + Balance",exercises:[{pat:"Lunge",compound:true,name:"B-stance Squat (KB)",detail:"3 × 10 je Seite · ruhiges Tempo",sets:3},{pat:"Pull-H",compound:true,name:"Chest-supported DB Row",detail:"3 × 12 · leichter",sets:3},{pat:"Squat",compound:false,name:"Wall Sit",detail:"3 × 30 Sek.",sets:3},{pat:"Rotation",compound:false,name:"Banded Standing Rotation",detail:"3 × 12 je Seite",sets:3},{pat:"Pull-V",compound:false,name:"Scapular Pull-up",detail:"3 × 10",sets:3}],finisher:"Front-rack Carry · 2 × 20 m"},{label:"Tag D",sub:"Freitag",warmup:"10 min Rudern ~2,1 km + Mobilität",exercises:[{pat:"Push-V",compound:true,name:"DB Press sitzend (leicht)",detail:"3 × 12 · kein Hohlkreuz",sets:3},{pat:"Hinge",compound:true,name:"45° Back Extension",detail:"3 × 12 · Rückenstrecker aktiv",sets:3},{pat:"Pull-V",compound:false,name:"Straight-arm Pulldown",detail:"3 × 12",sets:3},{pat:"Pull-H",compound:false,name:"Banded Pull-apart",detail:"3 × 20",sets:3}],finisher:"Kettlebell Rack Walk · 2 × 20 m"}]},{week:6,dates:"15.–21. Juni 2026",zyklus:"Follikelphase (Tag 8–14) → Energie steigt, Kraft aufbauen",zyklusNote:null,days:[{label:"Tag A",sub:"Montag",warmup:"10 min Rudern ~2,1 km + Balance mit KB overhead",exercises:[{pat:"Squat",compound:true,name:"Back Squat",detail:"3 × 10 · progressiv zu Wo.3",sets:3},{pat:"Pull-V",compound:true,name:"Chin-up",detail:"3 × 8 · voller ROM",sets:3},{pat:"Hinge",compound:false,name:"Reverse Hyper",detail:"3 × 15",sets:3},{pat:"Push-V",compound:false,name:"Plate Halo",detail:"3 × 10 je Richtung",sets:3},{pat:"Anti-Rot",compound:false,name:"Pallof Press",detail:"3 × 12 je Seite",sets:3}],finisher:"Farmer's Carry · 3 × 30 m"},{label:"Tag B",sub:"Dienstag",warmup:"10 min Rudern ~2,1 km + dynamisch",exercises:[{pat:"Push-H",compound:true,name:"Floor Press (BB)",detail:"3 × 10 · schulterfreundlich",sets:3},{pat:"Hinge",compound:true,name:"B-stance Hip Thrust (BB)",detail:"3 × 10 je Seite",sets:3},{pat:"Lunge",compound:false,name:"Walking Lunge (BB)",detail:"3 × 10 je Seite",sets:3},{pat:"Pull-H",compound:false,name:"Single-arm Cable Row",detail:"3 × 12 je Seite",sets:3},{pat:"Rotation",compound:false,name:"Cable Wood Chop",detail:"3 × 12 je Seite",sets:3},{pat:"Anti-Rot",compound:false,name:"Stir-the-pot",detail:"3 × 10 je Richtung",sets:3}],finisher:"Sled Push · 3 × 20 m"},{label:"Tag C",sub:"Donnerstag",warmup:"10 min Rudern ~2,1 km + Treppenspringen 5 min",exercises:[{pat:"Lunge",compound:true,name:"Bulgarian Split Squat (BB)",detail:"3 × 8 je Seite · schwerer als Wo.2",sets:3},{pat:"Pull-H",compound:true,name:"Pendlay Row",detail:"3 × 8 · dead-stop, explosiv hoch",sets:3},{pat:"Squat",compound:false,name:"Cossack Squat",detail:"3 × 8 je Seite",sets:3},{pat:"Push-H",compound:false,name:"Diamond Push-up",detail:"3 × 12",sets:3},{pat:"Pull-V",compound:false,name:"Cable Pullover",detail:"3 × 12",sets:3},{pat:"Rotation",compound:false,name:"Landmine Rainbow",detail:"3 × 10 je Seite",sets:3}],finisher:"Trap Bar Carry · 3 × 25 m"},{label:"Tag D",sub:"Freitag",warmup:"10 min Rudern ~2,1 km + BWS-Mobilität",exercises:[{pat:"Push-V",compound:true,name:"Landmine Press",detail:"3 × 10 · halbseitig, stabil",sets:3},{pat:"Hinge",compound:true,name:"Trap Bar Deadlift",detail:"3 × 8 · schwerer als Wo.1",sets:3},{pat:"Pull-V",compound:false,name:"Half-kneeling Cable Pulldown",detail:"3 × 12 je Seite",sets:3},{pat:"Pull-H",compound:false,name:"High Row (Kabel)",detail:"3 × 12",sets:3}],finisher:"Overhead Carry · 3 × 20 m"}]},{week:7,dates:"22.–28. Juni 2026",zyklus:"Ovulation + frühe Lutealphase → Energie-Peak, höchste Lasten",zyklusNote:null,days:[{label:"Tag A",sub:"Montag",warmup:"10 min Rudern ~2,1 km + Balance: Einbeinstand Augen zu",exercises:[{pat:"Squat",compound:true,name:"Front Squat",detail:"3 × 10 · Peak-Gewicht Block 1",sets:3},{pat:"Pull-V",compound:true,name:"Weighted Pull-up",detail:"3 × 6 · höchstes Gewicht bisher",sets:3},{pat:"Hinge",compound:false,name:"Nordic Hamstring Curl",detail:"3 × 6 · exzentrisch 4 Sek.",sets:3},{pat:"Push-V",compound:false,name:"Arnold Press",detail:"3 × 10",sets:3},{pat:"Anti-Rot",compound:false,name:"Body Saw",detail:"3 × 10",sets:3}],finisher:"Farmer's Carry · 3 × 35 m"},{label:"Tag B",sub:"Dienstag",warmup:"10 min Rudern ~2,1 km + explosiv: Jumping Jacks, Ausfallschritte",exercises:[{pat:"Push-H",compound:true,name:"Incline Bench Press (BB)",detail:"3 × 8 · Peak",sets:3},{pat:"Hinge",compound:true,name:"RDL (BB) – schwerste Variante",detail:"3 × 8",sets:3},{pat:"Lunge",compound:false,name:"Loaded Step-up (BB)",detail:"3 × 10 je Seite",sets:3},{pat:"Pull-H",compound:false,name:"Cable Rear Delt Row (Seil)",detail:"3 × 15",sets:3},{pat:"Rotation",compound:false,name:"Rotational Ball Throw",detail:"3 × 12 je Seite",sets:3},{pat:"Anti-Rot",compound:false,name:"Renegade Row",detail:"3 × 8 je Seite",sets:3}],finisher:"Sled Push · 3 × 25 m"},{label:"Tag C",sub:"Donnerstag",warmup:"10 min Rudern ~2,1 km + Treppenspringen 5 min",exercises:[{pat:"Lunge",compound:true,name:"Skater Squat",detail:"3 × 8 je Seite",sets:3},{pat:"Pull-H",compound:true,name:"T-bar Row",detail:"3 × 8 · schwerste Variante Block 1",sets:3},{pat:"Squat",compound:false,name:"Sissy Squat",detail:"3 × 12",sets:3},{pat:"Push-H",compound:false,name:"DB Fly (flach)",detail:"3 × 12",sets:3},{pat:"Pull-V",compound:false,name:"Scapular Pull-up",detail:"3 × 12",sets:3},{pat:"Rotation",compound:false,name:"Standing Cable Rotation",detail:"3 × 12 je Seite",sets:3}],finisher:"Kettlebell Rack Walk · 3 × 25 m je Seite"},{label:"Tag D",sub:"Freitag",warmup:"10 min Rudern ~2,1 km + Thoraxmobilität",exercises:[{pat:"Push-V",compound:true,name:"Push Press",detail:"3 × 6 · explosiv, Peak-Gewicht",sets:3},{pat:"Hinge",compound:true,name:"Conventional Deadlift",detail:"3 × 6 · schwerste Last Block 1",sets:3},{pat:"Pull-V",compound:false,name:"Neutral-grip Pull-up",detail:"3 × 8",sets:3},{pat:"Pull-H",compound:false,name:"Inverted Row / TRX",detail:"3 × 12 · Füße erhöht",sets:3}],finisher:"Overhead Carry · 3 × 20 m je Seite"}]},{week:8,dates:"29. Jun – 5. Jul 2026",zyklus:"Lutealphase (Tag 22–28) → Volumen reduziert, Qualität über Quantität",zyklusNote:null,days:[{label:"Tag A",sub:"Montag",warmup:"10 min Rudern ~2,1 km + Hüftmobilität",exercises:[{pat:"Squat",compound:true,name:"Goblet Squat (Tempo)",detail:"3 × 10 · 4-1-2-Tempo",sets:3},{pat:"Pull-V",compound:true,name:"Lat Pulldown (weiter Griff)",detail:"3 × 12",sets:3},{pat:"Hinge",compound:false,name:"Single-leg RDL (BB)",detail:"3 × 10 je Seite",sets:3},{pat:"Push-V",compound:false,name:"Y-raise",detail:"3 × 15",sets:3},{pat:"Anti-Rot",compound:false,name:"Half-kneeling Pallof Press",detail:"3 × 12 je Seite",sets:3}],finisher:"Farmer's Carry · 3 × 30 m"},{label:"Tag B",sub:"Dienstag",warmup:"10 min Rudern ~2,1 km + dynamisch",exercises:[{pat:"Push-H",compound:true,name:"Single-arm DB Bench Press",detail:"3 × 10 je Seite",sets:3},{pat:"Hinge",compound:true,name:"Kettlebell Swing",detail:"3 × 20 · Ausdauer + Kraft",sets:3},{pat:"Lunge",compound:false,name:"Slider Reverse Lunge",detail:"3 × 10 je Seite",sets:3},{pat:"Pull-H",compound:false,name:"Banded Pull-apart",detail:"3 × 20",sets:3},{pat:"Rotation",compound:false,name:"Tall-kneeling Chop",detail:"3 × 10 je Seite",sets:3},{pat:"Anti-Rot",compound:false,name:"Pallof Iso Hold",detail:"3 × 25 Sek. je Seite",sets:3}],finisher:"Suitcase Carry · 3 × 30 m je Seite"},{label:"Tag C",sub:"Donnerstag",warmup:"10 min Rudern ~2,1 km + Treppenspringen 4 min",exercises:[{pat:"Lunge",compound:true,name:"Curtsy Lunge (KB)",detail:"3 × 10 je Seite",sets:3},{pat:"Pull-H",compound:true,name:"Seated Cable Row",detail:"3 × 12",sets:3},{pat:"Squat",compound:false,name:"Leg Extension",detail:"3 × 15",sets:3},{pat:"Push-H",compound:false,name:"Pec Deck",detail:"3 × 12",sets:3},{pat:"Pull-V",compound:false,name:"Straight-arm Pulldown",detail:"3 × 12",sets:3},{pat:"Rotation",compound:false,name:"Half-kneeling Chop",detail:"3 × 10 je Seite",sets:3}],finisher:"Front-rack Carry · 3 × 25 m"},{label:"Tag D",sub:"Freitag",warmup:"10 min Rudern ~2,1 km + BWS-Rotation",exercises:[{pat:"Push-V",compound:true,name:"Tall-kneeling Press (BB)",detail:"3 × 10",sets:3},{pat:"Hinge",compound:true,name:"Stiff-leg Deadlift",detail:"3 × 10 · Hamstrings-Fokus",sets:3},{pat:"Pull-V",compound:false,name:"Banded Lat Pulldown",detail:"3 × 15",sets:3},{pat:"Pull-H",compound:false,name:"Rear Delt Fly (DB)",detail:"3 × 15",sets:3}],finisher:"Trap Bar Carry · 3 × 25 m"}]},{week:9,dates:"6.–12. Jul 2026",zyklus:"Deload-Woche · Block 1 abschließen · Bereit für Block 2",zyklusNote:"Deload-Woche – Volumen & Gewichte 40% reduziert. Bewegung halten, Erholung maximieren.",days:[{label:"Tag A",sub:"Montag",warmup:"10 min Rudern ~2,1 km + ausführliche Mobilität",exercises:[{pat:"Squat",compound:true,name:"Goblet Squat",detail:"2 × 10 · leicht",sets:2},{pat:"Pull-V",compound:true,name:"Lat Pulldown",detail:"2 × 10 · leicht",sets:2},{pat:"Anti-Rot",compound:false,name:"Dead Bug",detail:"2 × 10 je Seite",sets:2}],finisher:"Farmer's Carry · 2 × 20 m"},{label:"Tag B",sub:"Dienstag",warmup:"10 min Rudern ~2,1 km + sanftes Aufwärmen",exercises:[{pat:"Push-H",compound:true,name:"Push-up",detail:"2 × 12 · Körpergewicht",sets:2},{pat:"Hinge",compound:true,name:"KB Deadlift",detail:"2 × 10 · leicht",sets:2},{pat:"Anti-Rot",compound:false,name:"Bird Dog",detail:"2 × 10 je Seite",sets:2}],finisher:"Suitcase Carry · 2 × 20 m"},{label:"Tag C",sub:"Donnerstag",warmup:"10 min Rudern ~2,1 km + Balance",exercises:[{pat:"Lunge",compound:true,name:"Reverse Lunge (KB)",detail:"2 × 10 je Seite · leicht",sets:2},{pat:"Pull-H",compound:true,name:"Inverted Row",detail:"2 × 10 · leicht",sets:2},{pat:"Rotation",compound:false,name:"Banded Standing Rotation",detail:"2 × 10 je Seite",sets:2}],finisher:"Front-rack Carry · 2 × 20 m"},{label:"Tag D",sub:"Freitag",warmup:"10 min Rudern ~2,1 km · ruhiges Tempo",exercises:[{pat:"Push-V",compound:true,name:"DB Press sitzend",detail:"2 × 10 · leicht",sets:2},{pat:"Hinge",compound:true,name:"RDL (KB)",detail:"2 × 10 · leicht",sets:2},{pat:"Pull-V",compound:false,name:"Scapular Pull-up",detail:"2 × 10",sets:2}],finisher:"Overhead Carry · 2 × 15 m"}]}];
+// =====================================================
+// TRAININGSDATEN – alle 9 Wochen
+// =====================================================
+const DATA=[
+{week:1,dates:"11.–17. Mai 2026",zyklus:"Menstruation (Tag 4–10) → Ausleitung + Follikelphase beginnt",zyklusNote:"Leichte Woche – Intensität moderat halten.",lutealNote:null,hiitOptional:true,
+days:[
+{label:"Tag A",warmup:"10 min Rudern ~2,1 km + 5 min Balance: Einbeinstand auf Matte (je 45 Sek.)",
+exercises:[
+{pat:"Squat",compound:true,name:"Goblet Squat",detail:"3 × 12 · langsam, Fokus Kniestabilität",sets:3,reps:12},
+{pat:"Pull-V",compound:true,name:"Lat Pulldown (neutraler Griff)",detail:"3 × 12 · symmetrisch beidseits",sets:3,reps:12},
+{pat:"Hinge",compound:false,name:"Romanian Deadlift (RDL)",detail:"3 × 12 · Beckenkipp bewusst, Rücken neutral",sets:3,reps:12},
+{pat:"Push-V",compound:false,name:"DB Press sitzend",detail:"3 × 12 · kontrolliert",sets:3,reps:12},
+{pat:"Anti-Rot",compound:false,name:"Dead Bug",detail:"3 × 10 je Seite · langsam",sets:3,reps:10}
+],finisher:"Farmer's Carry · 3 × 25 m",
+stretch:[{name:"Hüftbeuger-Dehnung (kniend)",dur:"45 Sek. je Seite"},{name:"Quadrizeps-Stretch (stehend)",dur:"30 Sek. je Seite"},{name:"Adduktoren (Groin Stretch)",dur:"45 Sek. je Seite"},{name:"Thorax-Rotation (sitzend)",dur:"8 × je Seite"}]},
 
-// --- STATE HELPERS ---
-function sk(wi,di,ei,si){return`tp2_w${wi}d${di}e${ei}s${si}`;}
-function fk(wi,di){return`tp2_w${wi}d${di}fin`;}
-function wk(wi,di,ei,si){return`tp2_w${wi}d${di}e${ei}s${si}_wt`;}
-function nk(wi,di,ei,si){return`tp2_w${wi}d${di}e${ei}s${si}_nt`;}
-function sv(k,v){try{if(v===null||v==='')localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}}
-function lv(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
-function sb(k,v){try{localStorage.setItem(k,v?'1':'0');}catch(e){}}
-function lb(k){try{return localStorage.getItem(k)==='1';}catch(e){return false;}}
+{label:"Tag B",warmup:"10 min Rudern ~2,1 km + dynamisches Aufwärmen: Hüftkreise, Leg Swings",
+exercises:[
+{pat:"Push-H",compound:true,name:"Barbell Bench Press (flach)",detail:"3 × 12 · mittlerer Griff, Schulterblätter retrahiert",sets:3,reps:12},
+{pat:"Hinge",compound:true,name:"Barbell Hip Thrust",detail:"3 × 12 · Beckenneutralität, beidseits",sets:3,reps:12},
+{pat:"Lunge",compound:false,name:"Reverse Lunge",detail:"3 × 10 je Seite · kontrolliertes Absenken",sets:3,reps:10},
+{pat:"Pull-H",compound:false,name:"Face Pull",detail:"3 × 15 · externe Rotation betonen",sets:3,reps:15},
+{pat:"Rotation",compound:false,name:"Half-kneeling Chop",detail:"3 × 10 je Seite · stabile Basis",sets:3,reps:10},
+{pat:"Anti-Rot",compound:false,name:"Pallof Iso Hold",detail:"3 × 20 Sek. je Seite",sets:3,reps:20}
+],finisher:"Suitcase Carry · 3 × 20 m je Seite",
+stretch:[{name:"Brustdehnung (Türrahmen)",dur:"45 Sek."},{name:"Schulter anterior Stretch",dur:"30 Sek. je Seite"},{name:"Glute Bridge Dehnung (Figur-4)",dur:"45 Sek. je Seite"},{name:"Katze-Kuh",dur:"10 × langsam"}]},
+
+{label:"Tag C",warmup:"10 min Rudern ~2,1 km + 3 min Treppenspringen (moderat)",
+exercises:[
+{pat:"Lunge",compound:true,name:"Reverse Lunge (KB)",detail:"3 × 10 je Seite · aufrecht, Oberkörper stabil",sets:3,reps:10},
+{pat:"Pull-H",compound:true,name:"Chest-supported DB Row",detail:"3 × 12 · beidseits symmetrisch",sets:3,reps:12},
+{pat:"Squat",compound:false,name:"Heels-elevated Squat (Goblet)",detail:"3 × 12 · Kniestabilität",sets:3,reps:12},
+{pat:"Push-H",compound:false,name:"DB Fly (flach)",detail:"3 × 12 · weite Dehnung",sets:3,reps:12},
+{pat:"Pull-V",compound:false,name:"Straight-arm Pulldown",detail:"3 × 12 · Lat-Kontraktion betonen",sets:3,reps:12},
+{pat:"Rotation",compound:false,name:"Banded Standing Rotation",detail:"3 × 12 je Seite",sets:3,reps:12}
+],finisher:"Front-rack Carry (KB) · 3 × 20 m",
+stretch:[{name:"Lat-Dehnung (hängend oder Wand)",dur:"30 Sek. je Seite"},{name:"Hüftbeuger tief",dur:"45 Sek. je Seite"},{name:"Trizeps-Stretch overhead",dur:"30 Sek. je Seite"},{name:"Seitstütz-Stretch",dur:"30 Sek. je Seite"}]},
+
+{label:"Tag D",warmup:"10 min Rudern ~2,1 km + Schulterkreisen, Katze-Kuh (5 Wdh.)",
+exercises:[
+{pat:"Push-V",compound:true,name:"DB Press stehend",detail:"3 × 12 · Rumpf angespannt, kein Hohlkreuz",sets:3,reps:12},
+{pat:"Hinge",compound:true,name:"Trap Bar Deadlift",detail:"3 × 10 · neutrale Wirbelsäule, symmetrisch",sets:3,reps:10},
+{pat:"Pull-V",compound:false,name:"Chin-up (assistiert)",detail:"3 × 8 · voller Bewegungsumfang",sets:3,reps:8},
+{pat:"Pull-H",compound:false,name:"Rear Delt Fly (DB)",detail:"3 × 15",sets:3,reps:15},
+{pat:"Tricep",compound:false,name:"Overhead Tricep Extension (DB)",detail:"3 × 12 · volle Streckung",sets:3,reps:12}
+],finisher:"Overhead Carry · 3 × 15 m je Seite",
+stretch:[{name:"Hamstring-Dehnung liegend",dur:"45 Sek. je Seite"},{name:"Schulter posterior Stretch",dur:"30 Sek. je Seite"},{name:"Rückenstrecker-Dehnung (Kind-Haltung)",dur:"60 Sek."},{name:"Hüft-Flexor Lunge",dur:"40 Sek. je Seite"}]}
+]},
+
+{week:2,dates:"18.–24. Mai 2026",zyklus:"Follikelphase (Tag 11–17) → steigende Energie, Kraft gut abrufbar",zyklusNote:null,lutealNote:null,hiitOptional:false,
+days:[
+{label:"Tag A",warmup:"10 min Rudern ~2,1 km + Balance: Einbeinstand mit leichter KB (je 45 Sek.)",
+exercises:[
+{pat:"Squat",compound:true,name:"Front Squat",detail:"3 × 10 · aufrechter Rumpf, Ellbogen hoch",sets:3,reps:10},
+{pat:"Pull-V",compound:true,name:"Pull-up (assistiert)",detail:"3 × 8 · voller ROM, symmetrisch",sets:3,reps:8},
+{pat:"Hinge",compound:false,name:"Single-leg RDL (KB)",detail:"3 × 10 je Seite · Hüftstabilität",sets:3,reps:10},
+{pat:"Push-V",compound:false,name:"Lateral Raise",detail:"3 × 15",sets:3,reps:15},
+{pat:"Anti-Rot",compound:false,name:"Bird Dog",detail:"3 × 10 je Seite · Lendenwirbel stabil",sets:3,reps:10}
+],finisher:"Farmer's Carry · 3 × 25 m",
+stretch:[{name:"Hüftbeuger-Dehnung",dur:"45 Sek. je Seite"},{name:"Quadrizeps stehend",dur:"30 Sek. je Seite"},{name:"Adduktoren",dur:"45 Sek. je Seite"},{name:"Thorax-Rotation",dur:"8 × je Seite"}]},
+
+{label:"Tag B",warmup:"10 min Rudern ~2,1 km + Ausfallschritte mit Rotation",
+exercises:[
+{pat:"Push-H",compound:true,name:"Incline Bench Press (BB)",detail:"3 × 10 · Oberbrust betonen",sets:3,reps:10},
+{pat:"Hinge",compound:true,name:"Kettlebell Swing",detail:"3 × 15 · explosiv, Hüftstoß",sets:3,reps:15},
+{pat:"Lunge",compound:false,name:"Walking Lunge (KB)",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Pull-H",compound:false,name:"Banded Pull-apart",detail:"3 × 20",sets:3,reps:20},
+{pat:"Rotation",compound:false,name:"Tall-kneeling Chop",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Tricep",compound:false,name:"Tricep Dips (Bank)",detail:"3 × 12 · Schultern runter",sets:3,reps:12}
+],finisher:"Suitcase Carry · 3 × 25 m je Seite",
+stretch:[{name:"Brustdehnung",dur:"45 Sek."},{name:"Trizeps-Stretch",dur:"30 Sek. je Seite"},{name:"Glute Bridge Figur-4",dur:"45 Sek. je Seite"},{name:"Hüft-Circles (stehend)",dur:"10 × je Richtung"}]},
+
+{label:"Tag C",warmup:"10 min Rudern ~2,1 km + Treppenspringen 4 min",
+exercises:[
+{pat:"Lunge",compound:true,name:"Bulgarian Split Squat (KB)",detail:"3 × 10 je Seite · Oberkörper aufrecht",sets:3,reps:10},
+{pat:"Pull-H",compound:true,name:"Single-arm DB Row",detail:"3 × 12 je Seite · Rumpf nicht rotieren",sets:3,reps:12},
+{pat:"Squat",compound:false,name:"Wall Sit",detail:"3 × 40 Sek.",sets:3,reps:40},
+{pat:"Push-H",compound:false,name:"Push-up (gewichtet)",detail:"3 × 12",sets:3,reps:12},
+{pat:"Pull-V",compound:false,name:"Scapular Pull-up",detail:"3 × 10 · Schulterblatt-Kontrolle",sets:3,reps:10},
+{pat:"Rotation",compound:false,name:"Cable Wood Chop (high–low)",detail:"3 × 12 je Seite",sets:3,reps:12}
+],finisher:"Front-rack Carry (KB) · 3 × 25 m",
+stretch:[{name:"Lat-Dehnung",dur:"30 Sek. je Seite"},{name:"Hüftbeuger tief",dur:"45 Sek. je Seite"},{name:"Wadenstretch",dur:"30 Sek. je Seite"},{name:"Seitstütz-Stretch",dur:"30 Sek. je Seite"}]},
+
+{label:"Tag D",warmup:"10 min Rudern ~2,1 km + Mobilität: Thorax-Rotation (je 8 Wdh.)",
+exercises:[
+{pat:"Push-V",compound:true,name:"Z-Press (BB)",detail:"3 × 10 · kein Hohlkreuz, Rumpf aktiv",sets:3,reps:10},
+{pat:"Hinge",compound:true,name:"Conventional Deadlift",detail:"3 × 8 · Rücken neutral, Brust raus",sets:3,reps:8},
+{pat:"Pull-V",compound:false,name:"Lat Pulldown (weiter Griff)",detail:"3 × 12",sets:3,reps:12},
+{pat:"Pull-H",compound:false,name:"Single-arm Cable Row",detail:"3 × 12 je Seite",sets:3,reps:12},
+{pat:"Tricep",compound:false,name:"Cable Tricep Pushdown",detail:"3 × 15 · Ellbogen fest",sets:3,reps:15}
+],finisher:"Trap Bar Carry · 3 × 20 m",
+stretch:[{name:"Hamstring liegend",dur:"45 Sek. je Seite"},{name:"Schulter posterior",dur:"30 Sek. je Seite"},{name:"Kind-Haltung",dur:"60 Sek."},{name:"Hüft-Flexor Lunge",dur:"40 Sek. je Seite"}]}
+]},
+
+{week:3,dates:"25.–31. Mai 2026",zyklus:"Ovulationsphase (Tag 18–21) → Energie-Peak, höchste Kraft abrufbar",zyklusNote:null,lutealNote:null,hiitOptional:false,
+days:[
+{label:"Tag A",warmup:"10 min Rudern ~2,1 km + Balance: Einbeinstand KB Overhead (je 30 Sek.)",
+exercises:[
+{pat:"Squat",compound:true,name:"Back Squat",detail:"3 × 10 · schwerer als Wo.2, Tempo 3-1-1",sets:3,reps:10},
+{pat:"Pull-V",compound:true,name:"Weighted Pull-up",detail:"3 × 6–8 · kleines Zusatzgewicht",sets:3,reps:7},
+{pat:"Hinge",compound:false,name:"B-stance RDL",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Push-V",compound:false,name:"Arnold Press",detail:"3 × 12",sets:3,reps:12},
+{pat:"Anti-Rot",compound:false,name:"Stir-the-pot",detail:"3 × 10 je Richtung",sets:3,reps:10}
+],finisher:"Farmer's Carry · 3 × 30 m",
+stretch:[{name:"Hüftbeuger-Dehnung",dur:"45 Sek. je Seite"},{name:"Quadrizeps stehend",dur:"30 Sek. je Seite"},{name:"Adduktoren",dur:"45 Sek. je Seite"},{name:"Thorax-Rotation",dur:"8 × je Seite"}]},
+
+{label:"Tag B",warmup:"10 min Rudern ~2,1 km + Ausfallschritte mit Rotation, Jumping Jacks",
+exercises:[
+{pat:"Push-H",compound:true,name:"Flat DB Press",detail:"3 × 10 · Peak-Woche: schwerer",sets:3,reps:10},
+{pat:"Hinge",compound:true,name:"RDL (BB)",detail:"3 × 10 · Hüftscharnier präzise",sets:3,reps:10},
+{pat:"Lunge",compound:false,name:"Lateral Lunge (KB)",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Pull-H",compound:false,name:"Face Pull",detail:"3 × 15",sets:3,reps:15},
+{pat:"Rotation",compound:false,name:"Rotational Ball Throw (Wand)",detail:"3 × 10 je Seite · explosiv",sets:3,reps:10},
+{pat:"Anti-Rot",compound:false,name:"Renegade Row",detail:"3 × 8 je Seite",sets:3,reps:8}
+],finisher:"Sled Push · 3 × 20 m",
+stretch:[{name:"Brustdehnung",dur:"45 Sek."},{name:"Schulter anterior",dur:"30 Sek. je Seite"},{name:"Glute Bridge Figur-4",dur:"45 Sek. je Seite"},{name:"Katze-Kuh",dur:"10 × langsam"}]},
+
+{label:"Tag C",warmup:"10 min Rudern ~2,1 km + Treppenspringen 5 min",
+exercises:[
+{pat:"Lunge",compound:true,name:"Front-foot elevated Split Squat",detail:"3 × 10 je Seite · tiefe Dehnung",sets:3,reps:10},
+{pat:"Pull-H",compound:true,name:"T-bar Row",detail:"3 × 10 · breiter Griff, Brust zum Griff",sets:3,reps:10},
+{pat:"Squat",compound:false,name:"Hack Squat (Maschine)",detail:"3 × 12",sets:3,reps:12},
+{pat:"Push-H",compound:false,name:"Cable Fly",detail:"3 × 12",sets:3,reps:12},
+{pat:"Pull-V",compound:false,name:"Cable Pullover (DB)",detail:"3 × 12",sets:3,reps:12},
+{pat:"Rotation",compound:false,name:"Cable Lift (low–high)",detail:"3 × 12 je Seite",sets:3,reps:12}
+],finisher:"Overhead Carry · 3 × 15 m je Seite",
+stretch:[{name:"Lat-Dehnung",dur:"30 Sek. je Seite"},{name:"Hüftbeuger tief",dur:"45 Sek. je Seite"},{name:"Trizeps overhead",dur:"30 Sek. je Seite"},{name:"Wadenstretch",dur:"30 Sek. je Seite"}]},
+
+{label:"Tag D",warmup:"10 min Rudern ~2,1 km + Schulter-Mobilität",
+exercises:[
+{pat:"Push-V",compound:true,name:"Push Press",detail:"3 × 8 · explosive Hüfte → Druck",sets:3,reps:8},
+{pat:"Hinge",compound:true,name:"Sumo Deadlift",detail:"3 × 8 · breitere Basis – symmetrisch",sets:3,reps:8},
+{pat:"Pull-V",compound:false,name:"Neutral-grip Pull-up",detail:"3 × 8",sets:3,reps:8},
+{pat:"Pull-H",compound:false,name:"High Row (Kabel, Ellbogen weit)",detail:"3 × 12",sets:3,reps:12},
+{pat:"Tricep",compound:false,name:"Overhead Tricep Extension (BB)",detail:"3 × 10 · Ellbogen eng",sets:3,reps:10}
+],finisher:"Kettlebell Rack Walk · 3 × 20 m je Seite",
+stretch:[{name:"Hamstring liegend",dur:"45 Sek. je Seite"},{name:"Schulter posterior",dur:"30 Sek. je Seite"},{name:"Kind-Haltung",dur:"60 Sek."},{name:"Pigeon Pose",dur:"60 Sek. je Seite"}]}
+]},
+
+{week:4,dates:"1.–7. Juni 2026",zyklus:"Lutealphase (Tag 22–28) → Kraft bleibt hoch, Volumen moderat",zyklusNote:null,lutealNote:"Lutealphase: erhöhter Erholungsbedarf. Proteinzufuhr betonen (mind. 1,8g/kg). Sanfter starten, Qualität vor Quantität.",hiitOptional:true,
+days:[
+{label:"Tag A",warmup:"10 min Rudern ~2,1 km + Balance + Hüftmobilität",
+exercises:[
+{pat:"Squat",compound:true,name:"Box Squat (BB)",detail:"3 × 10 · Pause auf der Box, explosiv hoch",sets:3,reps:10},
+{pat:"Pull-V",compound:true,name:"Lat Pulldown (enger Griff)",detail:"3 × 12",sets:3,reps:12},
+{pat:"Hinge",compound:false,name:"Nordic Hamstring Curl",detail:"3 × 6 · exzentrisch langsam",sets:3,reps:6},
+{pat:"Push-V",compound:false,name:"Y-raise",detail:"3 × 15 · Skapula-Kontrolle",sets:3,reps:15},
+{pat:"Anti-Rot",compound:false,name:"Dead Bug",detail:"3 × 10 je Seite",sets:3,reps:10}
+],finisher:"Farmer's Carry · 3 × 30 m",
+stretch:[{name:"Hüftbeuger-Dehnung",dur:"45 Sek. je Seite"},{name:"Quadrizeps stehend",dur:"30 Sek. je Seite"},{name:"Adduktoren",dur:"45 Sek. je Seite"},{name:"Thorax-Rotation",dur:"8 × je Seite"}]},
+
+{label:"Tag B",warmup:"10 min Rudern ~2,1 km + dynamisches Aufwärmen",
+exercises:[
+{pat:"Push-H",compound:true,name:"Close-grip Bench Press",detail:"3 × 10 · Trizeps & innere Brust",sets:3,reps:10},
+{pat:"Hinge",compound:true,name:"Single-leg Hip Thrust (KB)",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Lunge",compound:false,name:"Step-up (BB)",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Pull-H",compound:false,name:"Rear Delt Fly (Kabel)",detail:"3 × 15",sets:3,reps:15},
+{pat:"Rotation",compound:false,name:"Half-kneeling Chop",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Anti-Rot",compound:false,name:"Bird Dog Row",detail:"3 × 8 je Seite",sets:3,reps:8}
+],finisher:"Suitcase Carry · 3 × 25 m je Seite",
+stretch:[{name:"Brustdehnung",dur:"45 Sek."},{name:"Trizeps overhead",dur:"30 Sek. je Seite"},{name:"Glute Bridge Figur-4",dur:"45 Sek. je Seite"},{name:"Katze-Kuh",dur:"10 × langsam"}]},
+
+{label:"Tag C",warmup:"10 min Rudern ~2,1 km + Treppenspringen 4 min",
+exercises:[
+{pat:"Lunge",compound:true,name:"Pistol Squat (assistiert)",detail:"3 × 8 je Seite · TRX-Unterstützung ok",sets:3,reps:8},
+{pat:"Pull-H",compound:true,name:"Barbell Bent-over Row",detail:"3 × 10 · Rücken parallel, Ellbogen zurück",sets:3,reps:10},
+{pat:"Squat",compound:false,name:"Leg Press",detail:"3 × 12 · gleichmäßige Fußposition",sets:3,reps:12},
+{pat:"Push-H",compound:false,name:"Incline DB Fly",detail:"3 × 12",sets:3,reps:12},
+{pat:"Pull-V",compound:false,name:"Banded Lat Pulldown",detail:"3 × 15",sets:3,reps:15},
+{pat:"Rotation",compound:false,name:"Lying Windshield Wiper",detail:"3 × 10 je Seite · Lenden stabil",sets:3,reps:10}
+],finisher:"Front-rack Carry (KB) · 3 × 25 m",
+stretch:[{name:"Lat-Dehnung",dur:"30 Sek. je Seite"},{name:"Hüftbeuger tief",dur:"45 Sek. je Seite"},{name:"Wadenstretch",dur:"30 Sek. je Seite"},{name:"Seitstütz-Stretch",dur:"30 Sek. je Seite"}]},
+
+{label:"Tag D",warmup:"10 min Rudern ~2,1 km + Mobilität Brustwirbelsäule",
+exercises:[
+{pat:"Push-V",compound:true,name:"Half-kneeling Single-arm Press",detail:"3 × 10 je Seite · Lateralflexion vermeiden",sets:3,reps:10},
+{pat:"Hinge",compound:true,name:"Good Morning (leicht)",detail:"3 × 10 · Rückenstrecker aktiv, langsam",sets:3,reps:10},
+{pat:"Pull-V",compound:false,name:"Single-arm Lat Pulldown",detail:"3 × 12 je Seite",sets:3,reps:12},
+{pat:"Pull-H",compound:false,name:"Inverted Row (TRX)",detail:"3 × 12",sets:3,reps:12},
+{pat:"Tricep",compound:false,name:"Tricep Kickback (KB)",detail:"3 × 12 je Seite",sets:3,reps:12}
+],finisher:"Overhead Carry · 3 × 20 m je Seite",
+stretch:[{name:"Hamstring liegend",dur:"45 Sek. je Seite"},{name:"Schulter posterior",dur:"30 Sek. je Seite"},{name:"Kind-Haltung",dur:"60 Sek."},{name:"Pigeon Pose",dur:"60 Sek. je Seite"}]}
+]},
+
+{week:5,dates:"8.–14. Juni 2026",zyklus:"Menstruation (Tag 1–5) → leichte Woche",zyklusNote:"Leichte Woche – Periode ca. 05.06. Intensität reduziert, Fokus auf Technik & Core.",lutealNote:null,hiitOptional:true,
+days:[
+{label:"Tag A",warmup:"10 min Rudern ~2,1 km + sanfte Hüftmobilität",
+exercises:[
+{pat:"Squat",compound:true,name:"Goblet Squat (leichter)",detail:"3 × 12 · Tempo langsam",sets:3,reps:12},
+{pat:"Pull-V",compound:true,name:"Lat Pulldown (neutral)",detail:"3 × 12 · moderat",sets:3,reps:12},
+{pat:"Hinge",compound:false,name:"Glute Bridge (beidbeinig)",detail:"3 × 15 · sanft",sets:3,reps:15},
+{pat:"Anti-Rot",compound:false,name:"Dead Bug",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Push-V",compound:false,name:"Lateral Raise",detail:"3 × 15 · leicht",sets:3,reps:15}
+],finisher:"Farmer's Carry · 2 × 20 m (leichter)",
+stretch:[{name:"Hüftbeuger",dur:"45 Sek. je Seite"},{name:"Adduktoren sanft",dur:"40 Sek. je Seite"},{name:"Rücken-Twist liegend",dur:"30 Sek. je Seite"},{name:"Kind-Haltung",dur:"60 Sek."}]},
+
+{label:"Tag B",warmup:"10 min Rudern ~2,1 km (ruhiges Tempo)",
+exercises:[
+{pat:"Push-H",compound:true,name:"Push-up",detail:"3 × 15 · Körpergewicht",sets:3,reps:15},
+{pat:"Hinge",compound:true,name:"KB Deadlift (leicht)",detail:"3 × 12 · Fokus Technik",sets:3,reps:12},
+{pat:"Lunge",compound:false,name:"Reverse Lunge (KG)",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Pull-H",compound:false,name:"Face Pull",detail:"3 × 15",sets:3,reps:15},
+{pat:"Anti-Rot",compound:false,name:"Bird Dog",detail:"3 × 10 je Seite",sets:3,reps:10}
+],finisher:"Suitcase Carry · 2 × 20 m",
+stretch:[{name:"Brustdehnung sanft",dur:"40 Sek."},{name:"Schulter-Pendel",dur:"30 Sek. je Seite"},{name:"Hüftbeuger",dur:"45 Sek. je Seite"},{name:"Katze-Kuh",dur:"10 × langsam"}]},
+
+{label:"Tag C",warmup:"10 min Rudern ~2,1 km + Balance",
+exercises:[
+{pat:"Lunge",compound:true,name:"B-stance Squat (KB)",detail:"3 × 10 je Seite · ruhiges Tempo",sets:3,reps:10},
+{pat:"Pull-H",compound:true,name:"Chest-supported DB Row",detail:"3 × 12 · leichter",sets:3,reps:12},
+{pat:"Squat",compound:false,name:"Wall Sit",detail:"3 × 30 Sek.",sets:3,reps:30},
+{pat:"Rotation",compound:false,name:"Banded Standing Rotation",detail:"3 × 12 je Seite",sets:3,reps:12},
+{pat:"Pull-V",compound:false,name:"Scapular Pull-up",detail:"3 × 10",sets:3,reps:10}
+],finisher:"Front-rack Carry · 2 × 20 m",
+stretch:[{name:"Lat-Dehnung",dur:"30 Sek. je Seite"},{name:"Hüftbeuger tief",dur:"40 Sek. je Seite"},{name:"Seitstütz-Stretch",dur:"30 Sek. je Seite"},{name:"Rücken-Twist liegend",dur:"30 Sek. je Seite"}]},
+
+{label:"Tag D",warmup:"10 min Rudern ~2,1 km + Mobilität",
+exercises:[
+{pat:"Push-V",compound:true,name:"DB Press sitzend (leicht)",detail:"3 × 12 · kein Hohlkreuz",sets:3,reps:12},
+{pat:"Hinge",compound:true,name:"45° Back Extension",detail:"3 × 12 · Rückenstrecker aktiv",sets:3,reps:12},
+{pat:"Pull-V",compound:false,name:"Straight-arm Pulldown",detail:"3 × 12",sets:3,reps:12},
+{pat:"Pull-H",compound:false,name:"Banded Pull-apart",detail:"3 × 20",sets:3,reps:20}
+],finisher:"Kettlebell Rack Walk · 2 × 20 m",
+stretch:[{name:"Hamstring liegend",dur:"45 Sek. je Seite"},{name:"Schulter posterior",dur:"30 Sek. je Seite"},{name:"Kind-Haltung",dur:"60 Sek."},{name:"Thorax-Rotation sitzend",dur:"8 × je Seite"}]}
+]},
+
+{week:6,dates:"15.–21. Juni 2026",zyklus:"Follikelphase (Tag 8–14) → Energie steigt, Kraft aufbauen",zyklusNote:null,lutealNote:null,hiitOptional:false,
+days:[
+{label:"Tag A",warmup:"10 min Rudern ~2,1 km + Balance mit KB overhead",
+exercises:[
+{pat:"Squat",compound:true,name:"Back Squat",detail:"3 × 10 · progressiv zu Wo.3",sets:3,reps:10},
+{pat:"Pull-V",compound:true,name:"Chin-up",detail:"3 × 8 · voller ROM",sets:3,reps:8},
+{pat:"Hinge",compound:false,name:"Reverse Hyper",detail:"3 × 15",sets:3,reps:15},
+{pat:"Push-V",compound:false,name:"Plate Halo",detail:"3 × 10 je Richtung",sets:3,reps:10},
+{pat:"Anti-Rot",compound:false,name:"Pallof Press",detail:"3 × 12 je Seite",sets:3,reps:12}
+],finisher:"Farmer's Carry · 3 × 30 m",
+stretch:[{name:"Hüftbeuger-Dehnung",dur:"45 Sek. je Seite"},{name:"Quadrizeps stehend",dur:"30 Sek. je Seite"},{name:"Adduktoren",dur:"45 Sek. je Seite"},{name:"Thorax-Rotation",dur:"8 × je Seite"}]},
+
+{label:"Tag B",warmup:"10 min Rudern ~2,1 km + dynamisch",
+exercises:[
+{pat:"Push-H",compound:true,name:"Floor Press (BB)",detail:"3 × 10 · schulterfreundlich",sets:3,reps:10},
+{pat:"Hinge",compound:true,name:"B-stance Hip Thrust (BB)",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Lunge",compound:false,name:"Walking Lunge (BB)",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Pull-H",compound:false,name:"Single-arm Cable Row",detail:"3 × 12 je Seite",sets:3,reps:12},
+{pat:"Rotation",compound:false,name:"Cable Wood Chop",detail:"3 × 12 je Seite",sets:3,reps:12},
+{pat:"Anti-Rot",compound:false,name:"Stir-the-pot",detail:"3 × 10 je Richtung",sets:3,reps:10}
+],finisher:"Sled Push · 3 × 20 m",
+stretch:[{name:"Brustdehnung",dur:"45 Sek."},{name:"Trizeps overhead",dur:"30 Sek. je Seite"},{name:"Glute Bridge Figur-4",dur:"45 Sek. je Seite"},{name:"Katze-Kuh",dur:"10 × langsam"}]},
+
+{label:"Tag C",warmup:"10 min Rudern ~2,1 km + Treppenspringen 5 min",
+exercises:[
+{pat:"Lunge",compound:true,name:"Bulgarian Split Squat (BB)",detail:"3 × 8 je Seite · schwerer als Wo.2",sets:3,reps:8},
+{pat:"Pull-H",compound:true,name:"Pendlay Row",detail:"3 × 8 · dead-stop, explosiv hoch",sets:3,reps:8},
+{pat:"Squat",compound:false,name:"Cossack Squat",detail:"3 × 8 je Seite",sets:3,reps:8},
+{pat:"Push-H",compound:false,name:"Diamond Push-up",detail:"3 × 12",sets:3,reps:12},
+{pat:"Pull-V",compound:false,name:"Cable Pullover",detail:"3 × 12",sets:3,reps:12},
+{pat:"Rotation",compound:false,name:"Landmine Rainbow",detail:"3 × 10 je Seite",sets:3,reps:10}
+],finisher:"Trap Bar Carry · 3 × 25 m",
+stretch:[{name:"Lat-Dehnung",dur:"30 Sek. je Seite"},{name:"Hüftbeuger tief",dur:"45 Sek. je Seite"},{name:"Wadenstretch",dur:"30 Sek. je Seite"},{name:"Seitstütz-Stretch",dur:"30 Sek. je Seite"}]},
+
+{label:"Tag D",warmup:"10 min Rudern ~2,1 km + BWS-Mobilität",
+exercises:[
+{pat:"Push-V",compound:true,name:"Landmine Press",detail:"3 × 10 · halbseitig, stabil",sets:3,reps:10},
+{pat:"Hinge",compound:true,name:"Trap Bar Deadlift",detail:"3 × 8 · schwerer als Wo.1",sets:3,reps:8},
+{pat:"Pull-V",compound:false,name:"Half-kneeling Cable Pulldown",detail:"3 × 12 je Seite",sets:3,reps:12},
+{pat:"Pull-H",compound:false,name:"High Row (Kabel)",detail:"3 × 12",sets:3,reps:12},
+{pat:"Tricep",compound:false,name:"Overhead Tricep Extension (KB)",detail:"3 × 12 · beidarmig",sets:3,reps:12}
+],finisher:"Overhead Carry · 3 × 20 m",
+stretch:[{name:"Hamstring liegend",dur:"45 Sek. je Seite"},{name:"Schulter posterior",dur:"30 Sek. je Seite"},{name:"Kind-Haltung",dur:"60 Sek."},{name:"Pigeon Pose",dur:"60 Sek. je Seite"}]}
+]},
+
+{week:7,dates:"22.–28. Juni 2026",zyklus:"Ovulation + frühe Lutealphase → Energie-Peak, höchste Lasten",zyklusNote:null,lutealNote:null,hiitOptional:false,
+days:[
+{label:"Tag A",warmup:"10 min Rudern ~2,1 km + Balance: Einbeinstand Augen zu",
+exercises:[
+{pat:"Squat",compound:true,name:"Front Squat",detail:"3 × 10 · Peak-Gewicht Block 1",sets:3,reps:10},
+{pat:"Pull-V",compound:true,name:"Weighted Pull-up",detail:"3 × 6 · höchstes Gewicht bisher",sets:3,reps:6},
+{pat:"Hinge",compound:false,name:"Nordic Hamstring Curl",detail:"3 × 6 · exzentrisch 4 Sek.",sets:3,reps:6},
+{pat:"Push-V",compound:false,name:"Arnold Press",detail:"3 × 10",sets:3,reps:10},
+{pat:"Anti-Rot",compound:false,name:"Body Saw",detail:"3 × 10",sets:3,reps:10}
+],finisher:"Farmer's Carry · 3 × 35 m",
+stretch:[{name:"Hüftbeuger-Dehnung",dur:"45 Sek. je Seite"},{name:"Quadrizeps stehend",dur:"30 Sek. je Seite"},{name:"Adduktoren",dur:"45 Sek. je Seite"},{name:"Thorax-Rotation",dur:"8 × je Seite"}]},
+
+{label:"Tag B",warmup:"10 min Rudern ~2,1 km + explosiv: Jumping Jacks, Ausfallschritte",
+exercises:[
+{pat:"Push-H",compound:true,name:"Incline Bench Press (BB)",detail:"3 × 8 · Peak",sets:3,reps:8},
+{pat:"Hinge",compound:true,name:"RDL (BB) – schwerste Variante",detail:"3 × 8",sets:3,reps:8},
+{pat:"Lunge",compound:false,name:"Loaded Step-up (BB)",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Pull-H",compound:false,name:"Cable Rear Delt Row (Seil)",detail:"3 × 15",sets:3,reps:15},
+{pat:"Rotation",compound:false,name:"Rotational Ball Throw",detail:"3 × 12 je Seite",sets:3,reps:12},
+{pat:"Anti-Rot",compound:false,name:"Renegade Row",detail:"3 × 8 je Seite",sets:3,reps:8}
+],finisher:"Sled Push · 3 × 25 m",
+stretch:[{name:"Brustdehnung",dur:"45 Sek."},{name:"Schulter anterior",dur:"30 Sek. je Seite"},{name:"Glute Bridge Figur-4",dur:"45 Sek. je Seite"},{name:"Katze-Kuh",dur:"10 × langsam"}]},
+
+{label:"Tag C",warmup:"10 min Rudern ~2,1 km + Treppenspringen 5 min",
+exercises:[
+{pat:"Lunge",compound:true,name:"Skater Squat",detail:"3 × 8 je Seite",sets:3,reps:8},
+{pat:"Pull-H",compound:true,name:"T-bar Row",detail:"3 × 8 · schwerste Variante Block 1",sets:3,reps:8},
+{pat:"Squat",compound:false,name:"Sissy Squat",detail:"3 × 12",sets:3,reps:12},
+{pat:"Push-H",compound:false,name:"DB Fly (flach)",detail:"3 × 12",sets:3,reps:12},
+{pat:"Pull-V",compound:false,name:"Scapular Pull-up",detail:"3 × 12",sets:3,reps:12},
+{pat:"Rotation",compound:false,name:"Standing Cable Rotation",detail:"3 × 12 je Seite",sets:3,reps:12}
+],finisher:"Kettlebell Rack Walk · 3 × 25 m je Seite",
+stretch:[{name:"Lat-Dehnung",dur:"30 Sek. je Seite"},{name:"Hüftbeuger tief",dur:"45 Sek. je Seite"},{name:"Wadenstretch",dur:"30 Sek. je Seite"},{name:"Seitstütz-Stretch",dur:"30 Sek. je Seite"}]},
+
+{label:"Tag D",warmup:"10 min Rudern ~2,1 km + Thoraxmobilität",
+exercises:[
+{pat:"Push-V",compound:true,name:"Push Press",detail:"3 × 6 · explosiv, Peak-Gewicht",sets:3,reps:6},
+{pat:"Hinge",compound:true,name:"Conventional Deadlift",detail:"3 × 6 · schwerste Last Block 1",sets:3,reps:6},
+{pat:"Pull-V",compound:false,name:"Neutral-grip Pull-up",detail:"3 × 8",sets:3,reps:8},
+{pat:"Pull-H",compound:false,name:"Inverted Row / TRX",detail:"3 × 12 · Füße erhöht",sets:3,reps:12},
+{pat:"Tricep",compound:false,name:"Close-grip Push-up",detail:"3 × 12",sets:3,reps:12}
+],finisher:"Overhead Carry · 3 × 20 m je Seite",
+stretch:[{name:"Hamstring liegend",dur:"45 Sek. je Seite"},{name:"Schulter posterior",dur:"30 Sek. je Seite"},{name:"Kind-Haltung",dur:"60 Sek."},{name:"Pigeon Pose",dur:"60 Sek. je Seite"}]}
+]},
+
+{week:8,dates:"29. Jun – 5. Jul 2026",zyklus:"Lutealphase (Tag 22–28) → Volumen reduziert, Qualität über Quantität",zyklusNote:null,lutealNote:"Lutealphase: erhöhter Erholungsbedarf. Proteinzufuhr betonen (mind. 1,8g/kg). Sanfter starten, Qualität vor Quantität.",hiitOptional:true,
+days:[
+{label:"Tag A",warmup:"10 min Rudern ~2,1 km + Hüftmobilität",
+exercises:[
+{pat:"Squat",compound:true,name:"Goblet Squat (Tempo)",detail:"3 × 10 · 4-1-2-Tempo",sets:3,reps:10},
+{pat:"Pull-V",compound:true,name:"Lat Pulldown (weiter Griff)",detail:"3 × 12",sets:3,reps:12},
+{pat:"Hinge",compound:false,name:"Single-leg RDL (BB)",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Push-V",compound:false,name:"Y-raise",detail:"3 × 15",sets:3,reps:15},
+{pat:"Anti-Rot",compound:false,name:"Half-kneeling Pallof Press",detail:"3 × 12 je Seite",sets:3,reps:12}
+],finisher:"Farmer's Carry · 3 × 30 m",
+stretch:[{name:"Hüftbeuger-Dehnung",dur:"45 Sek. je Seite"},{name:"Quadrizeps stehend",dur:"30 Sek. je Seite"},{name:"Adduktoren",dur:"45 Sek. je Seite"},{name:"Thorax-Rotation",dur:"8 × je Seite"}]},
+
+{label:"Tag B",warmup:"10 min Rudern ~2,1 km + dynamisch",
+exercises:[
+{pat:"Push-H",compound:true,name:"Single-arm DB Bench Press",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Hinge",compound:true,name:"Kettlebell Swing",detail:"3 × 20 · Ausdauer + Kraft",sets:3,reps:20},
+{pat:"Lunge",compound:false,name:"Slider Reverse Lunge",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Pull-H",compound:false,name:"Banded Pull-apart",detail:"3 × 20",sets:3,reps:20},
+{pat:"Rotation",compound:false,name:"Tall-kneeling Chop",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Anti-Rot",compound:false,name:"Pallof Iso Hold",detail:"3 × 25 Sek. je Seite",sets:3,reps:25}
+],finisher:"Suitcase Carry · 3 × 30 m je Seite",
+stretch:[{name:"Brustdehnung",dur:"45 Sek."},{name:"Trizeps overhead",dur:"30 Sek. je Seite"},{name:"Glute Bridge Figur-4",dur:"45 Sek. je Seite"},{name:"Katze-Kuh",dur:"10 × langsam"}]},
+
+{label:"Tag C",warmup:"10 min Rudern ~2,1 km + Treppenspringen 4 min",
+exercises:[
+{pat:"Lunge",compound:true,name:"Curtsy Lunge (KB)",detail:"3 × 10 je Seite",sets:3,reps:10},
+{pat:"Pull-H",compound:true,name:"Seated Cable Row",detail:"3 × 12",sets:3,reps:12},
+{pat:"Squat",compound:false,name:"Leg Extension",detail:"3 × 15",sets:3,reps:15},
+{pat:"Push-H",compound:false,name:"Pec Deck",detail:"3 × 12",sets:3,reps:12},
+{pat:"Pull-V",compound:false,name:"Straight-arm Pulldown",detail:"3 × 12",sets:3,reps:12},
+{pat:"Rotation",compound:false,name:"Half-kneeling Chop",detail:"3 × 10 je Seite",sets:3,reps:10}
+],finisher:"Front-rack Carry · 3 × 25 m",
+stretch:[{name:"Lat-Dehnung",dur:"30 Sek. je Seite"},{name:"Hüftbeuger tief",dur:"45 Sek. je Seite"},{name:"Wadenstretch",dur:"30 Sek. je Seite"},{name:"Seitstütz-Stretch",dur:"30 Sek. je Seite"}]},
+
+{label:"Tag D",warmup:"10 min Rudern ~2,1 km + BWS-Rotation",
+exercises:[
+{pat:"Push-V",compound:true,name:"Tall-kneeling Press (BB)",detail:"3 × 10",sets:3,reps:10},
+{pat:"Hinge",compound:true,name:"Stiff-leg Deadlift",detail:"3 × 10 · Hamstrings-Fokus",sets:3,reps:10},
+{pat:"Pull-V",compound:false,name:"Banded Lat Pulldown",detail:"3 × 15",sets:3,reps:15},
+{pat:"Pull-H",compound:false,name:"Rear Delt Fly (DB)",detail:"3 × 15",sets:3,reps:15},
+{pat:"Tricep",compound:false,name:"Cable Tricep Pushdown (Seil)",detail:"3 × 15",sets:3,reps:15}
+],finisher:"Trap Bar Carry · 3 × 25 m",
+stretch:[{name:"Hamstring liegend",dur:"45 Sek. je Seite"},{name:"Schulter posterior",dur:"30 Sek. je Seite"},{name:"Kind-Haltung",dur:"60 Sek."},{name:"Pigeon Pose",dur:"60 Sek. je Seite"}]}
+]},
+
+{week:9,dates:"6.–12. Jul 2026",zyklus:"Deload-Woche · Block 1 abschließen · Bereit für Block 2",zyklusNote:"Deload-Woche – Volumen & Gewichte 40% reduziert. Bewegung halten, Erholung maximieren.",lutealNote:null,hiitOptional:true,
+days:[
+{label:"Tag A",warmup:"10 min Rudern ~2,1 km + ausführliche Mobilität",
+exercises:[
+{pat:"Squat",compound:true,name:"Goblet Squat",detail:"2 × 10 · leicht",sets:2,reps:10},
+{pat:"Pull-V",compound:true,name:"Lat Pulldown",detail:"2 × 10 · leicht",sets:2,reps:10},
+{pat:"Anti-Rot",compound:false,name:"Dead Bug",detail:"2 × 10 je Seite",sets:2,reps:10}
+],finisher:"Farmer's Carry · 2 × 20 m",
+stretch:[{name:"Hüftbeuger",dur:"45 Sek. je Seite"},{name:"Adduktoren",dur:"45 Sek. je Seite"},{name:"Thorax-Rotation",dur:"8 × je Seite"},{name:"Kind-Haltung",dur:"60 Sek."}]},
+
+{label:"Tag B",warmup:"10 min Rudern ~2,1 km + sanftes Aufwärmen",
+exercises:[
+{pat:"Push-H",compound:true,name:"Push-up",detail:"2 × 12 · Körpergewicht",sets:2,reps:12},
+{pat:"Hinge",compound:true,name:"KB Deadlift",detail:"2 × 10 · leicht",sets:2,reps:10},
+{pat:"Anti-Rot",compound:false,name:"Bird Dog",detail:"2 × 10 je Seite",sets:2,reps:10}
+],finisher:"Suitcase Carry · 2 × 20 m",
+stretch:[{name:"Brustdehnung",dur:"40 Sek."},{name:"Schulter posterior",dur:"30 Sek. je Seite"},{name:"Hüftbeuger",dur:"45 Sek. je Seite"},{name:"Katze-Kuh",dur:"10 × langsam"}]},
+
+{label:"Tag C",warmup:"10 min Rudern ~2,1 km + Balance",
+exercises:[
+{pat:"Lunge",compound:true,name:"Reverse Lunge (KB)",detail:"2 × 10 je Seite · leicht",sets:2,reps:10},
+{pat:"Pull-H",compound:true,name:"Inverted Row",detail:"2 × 10 · leicht",sets:2,reps:10},
+{pat:"Rotation",compound:false,name:"Banded Standing Rotation",detail:"2 × 10 je Seite",sets:2,reps:10}
+],finisher:"Front-rack Carry · 2 × 20 m",
+stretch:[{name:"Lat-Dehnung",dur:"30 Sek. je Seite"},{name:"Hüftbeuger tief",dur:"45 Sek. je Seite"},{name:"Wadenstretch",dur:"30 Sek. je Seite"},{name:"Kind-Haltung",dur:"60 Sek."}]},
+
+{label:"Tag D",warmup:"10 min Rudern ~2,1 km · ruhiges Tempo",
+exercises:[
+{pat:"Push-V",compound:true,name:"DB Press sitzend",detail:"2 × 10 · leicht",sets:2,reps:10},
+{pat:"Hinge",compound:true,name:"RDL (KB)",detail:"2 × 10 · leicht",sets:2,reps:10},
+{pat:"Pull-V",compound:false,name:"Scapular Pull-up",detail:"2 × 10",sets:2,reps:10}
+],finisher:"Overhead Carry · 2 × 15 m",
+stretch:[{name:"Hamstring liegend",dur:"45 Sek. je Seite"},{name:"Schulter posterior",dur:"30 Sek. je Seite"},{name:"Kind-Haltung",dur:"60 Sek."},{name:"Pigeon Pose",dur:"60 Sek. je Seite"}]}
+]}
+];
+
+// =====================================================
+// STATE-HELFER (localStorage)
+// =====================================================
+const sk=(wi,di,ei,si)=>`tp3_w${wi}d${di}e${ei}s${si}`;
+const fk=(wi,di)=>`tp3_w${wi}d${di}fin`;
+const fwk=(wi,di)=>`tp3_w${wi}d${di}finwt`;
+const fnk=(wi,di)=>`tp3_w${wi}d${di}finnt`;
+const wk=(wi,di,ei,si)=>`tp3_w${wi}d${di}e${ei}s${si}_wt`;
+const nk=(wi,di,ei,si)=>`tp3_w${wi}d${di}e${ei}s${si}_nt`;
+const stk=(wi,di,sti)=>`tp3_w${wi}d${di}st${sti}`;
+const datek=(wi,di)=>`tp3_w${wi}d${di}date`;
+const hiitk=(wi,ri)=>`tp3_w${wi}hiit${ri}`;
+const hiitdevk=(wi)=>`tp3_w${wi}hiitdev`;
+const hiitnk=(wi,ri)=>`tp3_w${wi}hiit${ri}nt`;
+const hiitintk=(wi,ri)=>`tp3_w${wi}hiit${ri}int`;
+const fdk=(wi,fdi,field)=>`tp3_w${wi}fd${fdi}_${field}`;
+const tlk=(wi,di,field)=>`tp3_w${wi}d${di}tl_${field}`;
+const tlhk=(wi,di,field)=>`tp3_w${wi}d${di}tlh_${field}`;
+const sv=(k,v)=>{try{v===null||v===''?localStorage.removeItem(k):localStorage.setItem(k,v);}catch(e){}};
+const lv=(k)=>{try{return localStorage.getItem(k)||'';}catch(e){return '';}};
+const sb=(k,v)=>{try{localStorage.setItem(k,v?'1':'0');}catch(e){}};
+const lb=(k)=>{try{return localStorage.getItem(k)==='1';}catch(e){return false;}};
 
 let curWeek=0,curDay=new Array(9).fill(0),curView='plan';
+let hiitTimers={},mentalTimers={};
 
+// =====================================================
+// VIEW SWITCHER
+// =====================================================
 function switchView(v){
   curView=v;
-  document.getElementById('view-plan').classList.toggle('active',v==='plan');
-  document.getElementById('view-log').classList.toggle('active',v==='log');
-  document.getElementById('nav-plan').classList.toggle('active',v==='plan');
-  document.getElementById('nav-log').classList.toggle('active',v==='log');
-  if(v==='log') renderLog();
+  ['plan','mental','log'].forEach(id=>{
+    document.getElementById(`view-${id}`).classList.toggle('active',v===id);
+    document.getElementById(`nav-${id}`).classList.toggle('active',v===id);
+  });
+  if(v==='log')renderLog();
+  if(v==='mental')renderMental();
 }
 
-// --- GLOBAL PROGRESS ---
+// =====================================================
+// FORTSCHRITT BERECHNEN
+// =====================================================
 function countDayChecks(wi,di){
   const day=DATA[wi].days[di];
   let total=0,done=0;
-  day.exercises.forEach((ex,ei)=>{for(let si=0;si<ex.sets;si++){total++;if(lb(sk(wi,di,ei,si)))done++;}});
+  // Aufwärmen Cardio
+  total++; if(lb(wuCardioDonk(wi,di)))done++;
+  // Aufwärmen Extra (nur wenn vorhanden)
+  const parsed=parseWarmup(day.warmup);
+  if(parsed.extra){total++;if(lb(wuExtrak(wi,di)))done++;}
+  // Übungen
+  day.exercises.forEach((ex,ei)=>{
+    for(let si=0;si<ex.sets;si++){total++;if(lb(sk(wi,di,ei,si)))done++;}
+  });
+  // Finisher
   total++;if(lb(fk(wi,di)))done++;
+  // Stretching
+  day.stretch.forEach((_,sti)=>{total++;if(lb(stk(wi,di,sti)))done++;});
   return{total,done};
 }
+
 function updateGlobalProgress(){
   let t=0,d=0;
   DATA.forEach((_,wi)=>DATA[wi].days.forEach((_,di)=>{const c=countDayChecks(wi,di);t+=c.total;d+=c.done;}));
   const p=t?Math.round(d/t*100):0;
   document.getElementById('global-bar').style.width=p+'%';
-  document.getElementById('global-progress-text').textContent=`${d} von ${t} Sätzen erledigt · ${p}% Block 1`;
+  document.getElementById('global-progress-text').textContent=`${d} von ${t} Einheiten · ${p}% Block 1`;
 }
 
-// --- WEEK NAV ---
+// =====================================================
+// GEWICHT-FORTSCHRITT (Vergleich zu Woche 1)
+// =====================================================
+function getProgressIndicator(wi,di,ei){
+  if(wi===0)return'';
+  // Suche erstes gespeichertes Gewicht in Woche 1 für diese Übungsposition
+  const firstWt=lv(wk(0,di,ei,0));
+  const curWt=lv(wk(wi,di,ei,0));
+  if(!firstWt||!curWt)return'';
+  const diff=(parseFloat(curWt)-parseFloat(firstWt)).toFixed(1);
+  if(diff==0)return'';
+  const sign=diff>0?'+':'';
+  return`<div class="progress-indicator">${sign}${diff} kg seit Wo.1</div>`;
+}
+
+// =====================================================
+// WEEK NAV
+// =====================================================
 function renderWeekNav(){
   const nav=document.getElementById('week-nav');nav.innerHTML='';
   DATA.forEach((w,wi)=>{
     const btn=document.createElement('button');
     btn.className='week-btn'+(w.zyklusNote?' has-zyklus':'')+(wi===curWeek?' active':'');
-    btn.textContent=`Wo. ${w.week}`;
+    btn.textContent=`Wo.${w.week}`;
     btn.onclick=()=>{curWeek=wi;renderWeek();scrollTo(0,0);};
     nav.appendChild(btn);
   });
 }
 
-// --- RENDER WEEK ---
+// =====================================================
+// WOCHE RENDERN
+// =====================================================
 function renderWeek(){
   renderWeekNav();
   const container=document.getElementById('week-panels');container.innerHTML='';
   const w=DATA[curWeek];const wi=curWeek;
   const panel=document.createElement('div');panel.className='week-panel active';
-
-  let html=`<div class="week-title">Woche ${w.week}</div><div class="week-date">${w.dates}</div><div class="week-zyklus">${w.zyklus}</div>`;
+  let html=`<div class="week-title">Woche ${w.week}</div>
+  <div class="week-meta">${w.dates}</div>
+  <div class="week-zyklus">${w.zyklus}</div>`;
   if(w.zyklusNote)html+=`<div class="zyklus-note">${w.zyklusNote}</div>`;
+  if(w.lutealNote)html+=`<div class="luteal-note">💛 ${w.lutealNote}</div>`;
 
-  // Day tabs
+  // Tag-Tabs (A–D + HIIT)
   html+=`<div class="day-tabs" id="dtabs-${wi}">`;
   w.days.forEach((d,di)=>{
     const{total,done}=countDayChecks(wi,di);
     const isDone=done===total;
-    html+=`<button class="day-tab${di===curDay[wi]?' active':''}${isDone?' done':''}" onclick="switchDay(${wi},${di})">${d.label}<br><span style="font-weight:300;font-size:10px;">${d.sub}</span></button>`;
+    html+=`<button class="day-tab${di===curDay[wi]?' active':''}${isDone?' done':''}" onclick="switchDay(${wi},${di})">${d.label}</button>`;
   });
+  html+=`<button class="day-tab hiit-tab${curDay[wi]===99?' active':''}" onclick="switchDay(${wi},99)">HIIT</button>`;
   html+=`</div>`;
 
-  // Day contents
+  // Tag-Inhalte A–D
   w.days.forEach((d,di)=>{
     const{total,done}=countDayChecks(wi,di);
     const allDone=done===total;
+    const savedDate=lv(datek(wi,di));
     html+=`<div class="day-content${di===curDay[wi]?' active':''}" id="dc-${wi}-${di}">`;
-    html+=`<div class="warmup-card"><strong>Aufwärmen</strong>${d.warmup}</div>`;
 
+    // Datum-Header
+    html+=`<div class="day-date-header">
+      <span class="day-date-label">${d.label}</span>
+      <input class="date-input" type="date" value="${savedDate}" onchange="sv(datek(${wi},${di}),this.value)" title="Datum des Trainings">
+    </div>`;
+
+    // Aufwärmen – interaktiv
+    html+=renderWarmupCard(wi,di,d.warmup);
+
+    // Übungen
     d.exercises.forEach((ex,ei)=>{
       const allSetsDone=Array.from({length:ex.sets},(_,si)=>lb(sk(wi,di,ei,si))).every(Boolean);
+      const progressHtml=getProgressIndicator(wi,di,ei);
       html+=`<div class="exercise-card${allSetsDone?' completed':''}" id="exc-${wi}-${di}-${ei}">
         <div class="exercise-header">
           <div class="pattern-chip ${ex.compound?'chip-compound':'chip-accessory'}">${ex.pat}</div>
           <div class="exercise-info">
             <div class="exercise-name">${ex.name}</div>
             <div class="exercise-detail">${ex.detail}</div>
+            ${progressHtml}
           </div>
         </div>
         <div class="sets-container">`;
@@ -270,34 +873,72 @@ function renderWeek(){
         html+=`<div class="set-row">
           <span class="set-label-mini">S${si+1}</span>
           <button class="set-btn${done?' done':''}" id="sb-${wi}-${di}-${ei}-${si}" onclick="toggleSet(${wi},${di},${ei},${si})">${done?'✓':'○'}</button>
-          <div class="weight-input-wrap">
+          <div class="weight-wrap">
             <input class="weight-input" type="number" inputmode="decimal" min="0" step="0.5"
-              placeholder="—" value="${wtVal}"
-              id="wi-${wi}-${di}-${ei}-${si}"
-              onchange="saveWeight(${wi},${di},${ei},${si},this.value)"
-              onfocus="this.select()">
+              placeholder="—" value="${wtVal}" id="wi-${wi}-${di}-${ei}-${si}"
+              onchange="sv(wk(${wi},${di},${ei},${si}),this.value)" onfocus="this.select()">
             <span class="weight-unit">kg</span>
             <input class="weight-note" type="text" placeholder="Notiz…" value="${ntVal}"
-              id="ni-${wi}-${di}-${ei}-${si}"
-              onchange="saveNote(${wi},${di},${ei},${si},this.value)">
+              onchange="sv(nk(${wi},${di},${ei},${si}),this.value)">
           </div>
         </div>`;
       }
       html+=`</div></div>`;
     });
 
-    // Finisher
+    // Finisher (mit Gewicht)
     const finDone=lb(fk(wi,di));
+    const finWt=lv(fwk(wi,di));
+    const finNt=lv(fnk(wi,di));
     html+=`<div class="finisher-card" id="fin-${wi}-${di}">
-      <div><div class="flabel">Finisher</div><div class="fname">${d.finisher}</div></div>
+      <div class="finisher-info">
+        <div class="flabel">Finisher / Carry</div>
+        <div class="fname">${d.finisher}</div>
+        <div class="finisher-fields">
+          <input style="flex:0 0 80px" type="number" inputmode="decimal" placeholder="— kg" value="${finWt}"
+            onchange="sv(fwk(${wi},${di}),this.value)">
+          <input type="text" placeholder="Notiz…" value="${finNt}"
+            onchange="sv(fnk(${wi},${di}),this.value)">
+        </div>
+      </div>
       <button class="finisher-check${finDone?' done':''}" id="finbtn-${wi}-${di}" onclick="toggleFin(${wi},${di})">${finDone?'✓':'○'}</button>
     </div>`;
 
-    html+=`<div class="day-done-banner${allDone?' show':''}" id="ddb-${wi}-${di}">Training abgeschlossen ✓</div>`;
+    // Stretching
+    html+=`<div class="stretch-section">
+      <div class="stretch-header" onclick="toggleStretch(${wi},${di})">
+        <span class="stretch-header-label">🧘 Stretching (5–8 Min)</span>
+        <span class="stretch-toggle" id="strtoggle-${wi}-${di}">▾</span>
+      </div>
+      <div class="stretch-body" id="strbody-${wi}-${di}">`;
+    d.stretch.forEach((s,sti)=>{
+      const done=lb(stk(wi,di,sti));
+      html+=`<div class="stretch-item">
+        <button class="stretch-check${done?' done':''}" id="strbtn-${wi}-${di}-${sti}" onclick="toggleStretch2(${wi},${di},${sti})">${done?'✓':'○'}</button>
+        <div class="stretch-info">
+          <div class="stretch-name">${s.name}</div>
+          <div class="stretch-dur">${s.dur}</div>
+        </div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+
+    // Tages-Log
+    html+=renderTagesLog(wi,di);
+
+    // Done Banner
+    html+=`<div class="day-done-banner${allDone?' show':''}" id="ddb-${wi}-${di}">Tag abgeschlossen ✓</div>`;
     html+=`<button class="reset-btn" onclick="resetDay(${wi},${di})">Tag zurücksetzen</button>`;
-    html+=`</div>`;
+    html+=`</div>`; // day-content
   });
 
+  // HIIT Tab
+  html+=renderHiit(wi,w);
+
+  // Freie Tage
+  html+=renderFreieTage(wi);
+
+  // Navigation
   html+=`<div class="nav-arrows">`;
   html+=wi>0?`<button onclick="curWeek=${wi-1};renderWeek();scrollTo(0,0);">← Woche ${wi}</button>`:`<button disabled>← zurück</button>`;
   html+=wi<DATA.length-1?`<button class="primary" onclick="curWeek=${wi+1};renderWeek();scrollTo(0,0);">Woche ${wi+2} →</button>`:`<button disabled>weiter →</button>`;
@@ -308,10 +949,199 @@ function renderWeek(){
   updateGlobalProgress();
 }
 
-// --- INTERACTIONS ---
+// =====================================================
+// HIIT RENDERN
+// =====================================================
+function renderHiit(wi,w){
+  const isOpt=w.hiitOptional;
+  const savedDev=lv(hiitdevk(wi))||'Rudergerät';
+  let html=`<div class="day-content${curDay[wi]===99?' active':''}" id="dc-${wi}-99">`;
+  html+=`<div class="day-date-header"><span class="day-date-label">HIIT</span></div>`;
+  if(isOpt)html+=`<div class="hiit-note-optional">⚡ Optional diese Woche – nur wenn du dich gut fühlst und erholt bist.</div>`;
+  html+=`<div class="hiit-section">
+    <span class="card-label">Gerät wählen</span>
+    <div class="hiit-device-row">
+      <select onchange="sv(hiitdevk(${wi}),this.value)" id="hiitdev-${wi}">
+        ${['Rudergerät','Laufband','Fahrrad / Bike','Ski-Erg','Sonstiges'].map(o=>`<option${savedDev===o?' selected':''}>${o}</option>`).join('')}
+      </select>
+    </div>
+    <span class="card-label">3 × 30 Sek. Power On · volle Erholung dazwischen</span>`;
+
+  for(let ri=0;ri<3;ri++){
+    const done=lb(hiitk(wi,ri));
+    const intVal=lv(hiitintk(wi,ri));
+    const ntVal=lv(hiitnk(wi,ri));
+    html+=`<div class="hiit-round">
+      <div class="hiit-round-header">
+        <span class="hiit-round-num">Runde ${ri+1}</span>
+        <button class="hiit-timer-btn" id="hiittbtn-${wi}-${ri}" onclick="startHiitTimer(${wi},${ri})">▶ 30 Sek.</button>
+        <span class="hiit-timer-display" id="hiittdisp-${wi}-${ri}"></span>
+        <button class="hiit-round-check${done?' done':''}" id="hiitrchk-${wi}-${ri}" onclick="toggleHiitRound(${wi},${ri})">${done?'✓':'○'}</button>
+      </div>
+      <div class="hiit-round-fields">
+        <input type="text" placeholder="Intensität / Widerstand…" value="${intVal}" onchange="sv(hiitintk(${wi},${ri}),this.value)" style="flex:1">
+        <input type="text" placeholder="Notiz…" value="${ntVal}" onchange="sv(hiitnk(${wi},${ri}),this.value)" style="flex:1">
+      </div>
+    </div>`;
+  }
+  html+=`</div></div>`;
+  return html;
+}
+
+// HIIT Timer
+function startHiitTimer(wi,ri){
+  const key=`${wi}-${ri}`;
+  if(hiitTimers[key])return;
+  let secs=30;
+  const btn=document.getElementById(`hiittbtn-${wi}-${ri}`);
+  const disp=document.getElementById(`hiittdisp-${wi}-${ri}`);
+  btn.classList.add('running');
+  btn.textContent='…';
+  hiitTimers[key]=setInterval(()=>{
+    disp.textContent=secs+'s';
+    if(secs<=0){
+      clearInterval(hiitTimers[key]);delete hiitTimers[key];
+      btn.classList.remove('running');btn.textContent='✓ Done';
+      disp.textContent='';
+      if(navigator.vibrate)navigator.vibrate([200,100,200]);
+    }
+    secs--;
+  },1000);
+}
+
+function toggleHiitRound(wi,ri){
+  const k=hiitk(wi,ri);const nv=!lb(k);sb(k,nv);
+  const btn=document.getElementById(`hiitrchk-${wi}-${ri}`);
+  if(btn){btn.className='hiit-round-check'+(nv?' done':'');btn.textContent=nv?'✓':'○';}
+}
+
+// =====================================================
+// FREIE TAGE RENDERN
+// =====================================================
+function renderFreieTage(wi){
+  const types=['Yoga','Spaziergang','Schwimmen','Radfahren','Laufen','Meditation','Sonstiges'];
+  let html=`<div class="free-days-section"><div class="free-days-title">Freie Tage / Weitere Aktivitäten</div>`;
+  for(let fdi=0;fdi<3;fdi++){
+    const fDate=lv(fdk(wi,fdi,'date'));
+    const fType=lv(fdk(wi,fdi,'type'))||'Yoga';
+    const fDur=lv(fdk(wi,fdi,'dur'));
+    const fNote=lv(fdk(wi,fdi,'note'));
+    html+=`<div class="free-day-card">
+      <div class="free-day-header">
+        <span class="free-day-label">Freier Tag ${fdi+1}</span>
+        <input class="date-input" type="date" value="${fDate}" onchange="sv(fdk(${wi},${fdi},'date'),this.value)" style="max-width:140px;margin-left:auto;">
+      </div>
+      <div class="free-day-fields">
+        <div class="free-day-row">
+          <select onchange="sv(fdk(${wi},${fdi},'type'),this.value)" style="flex:2">
+            ${types.map(t=>`<option${fType===t?' selected':''}>${t}</option>`).join('')}
+          </select>
+          <input type="number" placeholder="Min." value="${fDur}" onchange="sv(fdk(${wi},${fdi},'dur'),this.value)" style="flex:1;max-width:80px" inputmode="numeric">
+          <span style="font-size:12px;color:var(--muted);flex-shrink:0;align-self:center">Min.</span>
+        </div>
+        <textarea placeholder="Notizen…" onchange="sv(fdk(${wi},${fdi},'note'),this.value)" style="min-height:50px">${fNote}</textarea>
+      </div>
+    </div>`;
+  }
+  html+=`</div>`;
+  return html;
+}
+
+// =====================================================
+// TAGES-LOG RENDERN
+// =====================================================
+function renderTagesLog(wi,di){
+  const fields=[
+    {key:'ernaehrung',label:'Ernährung heute',type:'textarea'},
+    {key:'supplements',label:'Supplements / NEMs heute',type:'textarea'},
+    {key:'aktivitaeten',label:'Weitere Aktivitäten heute',type:'textarea'},
+  ];
+  const energyVal=lv(tlk(wi,di,'energie'));
+  const schlafH=lv(tlk(wi,di,'schlafh'));
+  const schlafQ=lv(tlk(wi,di,'schlafq'));
+
+  let html=`<div class="tageslog-section">
+    <button class="tageslog-toggle-btn" onclick="toggleTagesLog(${wi},${di})">
+      <span>📋 Tages-Log</span><span id="tltogarrow-${wi}-${di}">▾</span>
+    </button>
+    <div class="tageslog-body" id="tlbody-${wi}-${di}">`;
+
+  // Körpergefühl Skala
+  html+=`<div class="tl-section">
+    <input class="tl-label-editable" type="text" value="${lv(tlhk(wi,di,'energie'))||'Körpergefühl & Energie (1–10)'}"
+      onchange="sv(tlhk(${wi},${di},'energie'),this.value)">
+    <div class="scale-row">`;
+  for(let i=1;i<=10;i++){
+    html+=`<button class="scale-btn${energyVal==i?' sel':''}" onclick="setScale(${wi},${di},'energie',${i})">${i}</button>`;
+  }
+  html+=`</div></div>`;
+
+  // Schlaf
+  html+=`<div class="tl-section">
+    <span class="tl-label">Schlaf letzte Nacht</span>
+    <div class="sleep-row">
+      <input type="number" inputmode="decimal" step="0.5" min="0" max="16" placeholder="h" value="${schlafH}"
+        onchange="sv(tlk(${wi},${di},'schlafh'),this.value)" style="flex:0 0 70px">
+      <span>Std. · Qualität:</span>`;
+  for(let i=1;i<=5;i++){
+    html+=`<button class="scale-btn${schlafQ==i?' sel':''}" onclick="setScale(${wi},${di},'schlafq',${i})" style="width:30px;height:30px;font-size:10px">${i}</button>`;
+  }
+  html+=`</div></div>`;
+
+  // Texfelder
+  fields.forEach(f=>{
+    const val=lv(tlk(wi,di,f.key));
+    const head=lv(tlhk(wi,di,f.key))||f.label;
+    html+=`<div class="tl-section">
+      <input class="tl-label-editable" type="text" value="${head}"
+        onchange="sv(tlhk(${wi},${di},'${f.key}'),this.value)">
+      <textarea placeholder="…" onchange="sv(tlk(${wi},${di},'${f.key}'),this.value)">${val}</textarea>
+    </div>`;
+  });
+  html+=`</div></div>`;
+  return html;
+}
+
+function toggleTagesLog(wi,di){
+  const body=document.getElementById(`tlbody-${wi}-${di}`);
+  const arr=document.getElementById(`tltogarrow-${wi}-${di}`);
+  const open=body.classList.toggle('open');
+  arr.textContent=open?'▴':'▾';
+}
+
+function setScale(wi,di,field,val){
+  sv(tlk(wi,di,field),val);
+  // Update UI
+  const allBtns=document.querySelectorAll(`#tlbody-${wi}-${di} .scale-btn`);
+  // Find the right scale group – simpler: re-render just that section not whole day
+  renderWeek();
+}
+
+// =====================================================
+// STRETCHING TOGGLE
+// =====================================================
+function toggleStretch(wi,di){
+  const body=document.getElementById(`strbody-${wi}-${di}`);
+  const tog=document.getElementById(`strtoggle-${wi}-${di}`);
+  const open=body.classList.toggle('open');
+  tog.classList.toggle('open',open);
+}
+
+function toggleStretch2(wi,di,sti){
+  const k=stk(wi,di,sti);const nv=!lb(k);sb(k,nv);
+  const btn=document.getElementById(`strbtn-${wi}-${di}-${sti}`);
+  if(btn){btn.className='stretch-check'+(nv?' done':'');btn.textContent=nv?'✓':'○';}
+  checkDayDone(wi,di);updateGlobalProgress();
+}
+
+// =====================================================
+// INTERAKTIONEN
+// =====================================================
 function switchDay(wi,di){
   curDay[wi]=di;
-  document.querySelectorAll(`#dtabs-${wi} .day-tab`).forEach((t,i)=>t.classList.toggle('active',i===di));
+  document.querySelectorAll(`#dtabs-${wi} .day-tab`).forEach((t,i)=>{
+    t.classList.toggle('active',i===di||(di===99&&i===4));
+  });
   document.querySelectorAll(`[id^="dc-${wi}-"]`).forEach(el=>el.classList.remove('active'));
   const dc=document.getElementById(`dc-${wi}-${di}`);if(dc)dc.classList.add('active');
 }
@@ -325,9 +1155,6 @@ function toggleSet(wi,di,ei,si){
   checkDayDone(wi,di);updateGlobalProgress();renderWeekNav();
 }
 
-function saveWeight(wi,di,ei,si,val){sv(wk(wi,di,ei,si),val);}
-function saveNote(wi,di,ei,si,val){sv(nk(wi,di,ei,si),val);}
-
 function toggleFin(wi,di){
   const k=fk(wi,di);const nv=!lb(k);sb(k,nv);
   const btn=document.getElementById(`finbtn-${wi}-${di}`);
@@ -338,81 +1165,90 @@ function toggleFin(wi,di){
 function checkDayDone(wi,di){
   const{total,done}=countDayChecks(wi,di);const allDone=done===total;
   const banner=document.getElementById(`ddb-${wi}-${di}`);if(banner)banner.classList.toggle('show',allDone);
-  const tabs=document.querySelectorAll(`#dtabs-${wi} .day-tab`);if(tabs[di])tabs[di].classList.toggle('done',allDone);
+  const tabs=document.querySelectorAll(`#dtabs-${wi} .day-tab`);
+  if(tabs[di])tabs[di].classList.toggle('done',allDone);
 }
 
 function resetDay(wi,di){
   const day=DATA[wi].days[di];
   day.exercises.forEach((ex,ei)=>{
-    for(let si=0;si<ex.sets;si++){
-      sb(sk(wi,di,ei,si),false);
-      const btn=document.getElementById(`sb-${wi}-${di}-${ei}-${si}`);
-      if(btn){btn.className='set-btn';btn.textContent='○';}
-      const card=document.getElementById(`exc-${wi}-${di}-${ei}`);if(card)card.classList.remove('completed');
-    }
+    for(let si=0;si<ex.sets;si++){sb(sk(wi,di,ei,si),false);}
   });
   sb(fk(wi,di),false);
-  const fb=document.getElementById(`finbtn-${wi}-${di}`);if(fb){fb.className='finisher-check';fb.textContent='○';}
-  const banner=document.getElementById(`ddb-${wi}-${di}`);if(banner)banner.classList.remove('show');
-  const tabs=document.querySelectorAll(`#dtabs-${wi} .day-tab`);if(tabs[di])tabs[di].classList.remove('done');
-  updateGlobalProgress();renderWeekNav();
+  day.stretch.forEach((_,sti)=>sb(stk(wi,di,sti),false));
+  renderWeek();updateGlobalProgress();
 }
 
-// --- LOGBUCH ---
+// =====================================================
+// LOGBUCH
+// =====================================================
 function renderLog(){
   const container=document.getElementById('log-content');container.innerHTML='';
   let hasData=false;
   DATA.forEach((w,wi)=>{
-    let weekHtml='';
-    let weekHasData=false;
+    let weekHtml='';let weekHasData=false;
     w.days.forEach((d,di)=>{
       const{total,done}=countDayChecks(wi,di);
       if(done===0)return;
       weekHasData=true;hasData=true;
       const pct=Math.round(done/total*100);
+      const savedDate=lv(datek(wi,di));
+      const dateStr=savedDate?` · ${new Date(savedDate).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})}`:'' ;
+      const wuDone=lb(wuCardioDonk(wi,di));
+      const wuDev=lv(wuCardioDevk(wi,di))||'Rudergerät';
+      const wuZeit=lv(wuCardioZeitk(wi,di));
+      const wuDist=lv(wuCardioDistk(wi,di));
       weekHtml+=`<div class="log-day">
-        <div class="log-day-header"><span>${d.label} · ${d.sub}</span><span class="log-day-date">${pct}% fertig</span></div>`;
+        <div class="log-day-header"><span>${d.label}${dateStr}</span><span class="log-day-pct">${pct}%</span></div>`;
+      if(wuDone||wuZeit||wuDist){
+        weekHtml+=`<div class="log-exercise" style="background:var(--blue-dim)"><div class="log-ex-name" style="color:var(--blue)">🚣 Aufwärmen: ${wuDev}${wuZeit?' · '+wuZeit+' Min.':''}${wuDist?' · '+wuDist+' km':''}</div></div>`;
+      }
       d.exercises.forEach((ex,ei)=>{
-        const sets=[];
-        let anyDone=false;
+        const sets=[];let anyDone=false;
         for(let si=0;si<ex.sets;si++){
           const done=lb(sk(wi,di,ei,si));
           const wt=lv(wk(wi,di,ei,si));
           const nt=lv(nk(wi,di,ei,si));
-          if(done||wt||nt){anyDone=true;}
+          if(done||wt||nt)anyDone=true;
           if(done||wt){
             let label=`S${si+1}`;
-            if(wt)label+=` · ${wt} kg`;
+            if(wt)label+=` · ${wt}kg`;
             if(nt)label+=` · ${nt}`;
             sets.push({label,hasWeight:!!wt,done});
           }
         }
         if(!anyDone)return;
-        weekHtml+=`<div class="log-exercise">
-          <div class="log-ex-name">${ex.name}</div>
-          <div class="log-sets">`;
+        weekHtml+=`<div class="log-exercise"><div class="log-ex-name">${ex.name}</div><div class="log-sets">`;
         sets.forEach(s=>{
-          const cls=s.hasWeight?'has-weight':s.done?'done-no-weight':'';
-          weekHtml+=`<span class="log-set-pill ${cls}">${s.label}</span>`;
+          weekHtml+=`<span class="log-set-pill ${s.hasWeight?'has-weight':s.done?'done-only':''}">${s.label}</span>`;
         });
         weekHtml+=`</div></div>`;
       });
       // Finisher
       const finDone=lb(fk(wi,di));
-      if(finDone){weekHtml+=`<div class="log-exercise"><div class="log-ex-name" style="color:var(--accent)">✓ Finisher: ${d.finisher}</div></div>`;}
+      const finWt=lv(fwk(wi,di));
+      if(finDone||finWt){
+        weekHtml+=`<div class="log-exercise"><div class="log-ex-name" style="color:var(--accent)">✓ ${d.finisher}${finWt?' · '+finWt+'kg':''}</div></div>`;
+      }
+      // Tages-Log Felder
+      const energie=lv(tlk(wi,di,'energie'));
+      const schlafH=lv(tlk(wi,di,'schlafh'));
+      if(energie||schlafH){
+        weekHtml+=`<div class="log-exercise" style="font-size:11px;color:var(--muted)">`;
+        if(energie)weekHtml+=`Energie: ${energie}/10 `;
+        if(schlafH)weekHtml+=`· Schlaf: ${schlafH}h`;
+        weekHtml+=`</div>`;
+      }
       weekHtml+=`</div>`;
     });
     if(weekHasData){
       container.innerHTML+=`<div class="log-week"><div class="log-week-title">Woche ${w.week} · ${w.dates}</div>${weekHtml}</div>`;
     }
   });
-  if(!hasData){
-    container.innerHTML=`<div class="log-empty">Noch keine Trainings abgeschlossen.<br>Hake im Training deine Sätze ab – sie erscheinen dann hier.</div>`;
-  }
+  if(!hasData)container.innerHTML=`<div class="log-empty">Noch keine Trainings abgehakt.<br>Hake Sätze im Training ab – sie erscheinen hier.</div>`;
 }
 
 function printLog(){
-  // Switch to log view for print, then restore
   const allViews=document.querySelectorAll('.view');
   allViews.forEach(v=>v.style.display='none');
   document.getElementById('view-log').style.display='block';
@@ -421,7 +1257,326 @@ function printLog(){
   switchView('log');
 }
 
+// =====================================================
+// MENTALE STÄRKE
+// =====================================================
+const AFFIRMATIONS=[
+  "Ich werde stärker mit jedem Training.",
+  "Mein Alter ist meine Stärke.",
+  "Ich vertraue meinem Körper.",
+  "Jeder Satz bringt mich näher zu meiner besten Version.",
+  "Ich bin Energie, Kraft und Fokus.",
+  "Mein Geist führt, mein Körper folgt.",
+  "Ich schaffe, was ich mir vornehme.",
+  "Stärke wächst, wenn es schwer wird.",
+  "Ich bin dankbar für jeden gesunden Tag.",
+  "47 ist die neue Stärke."
+];
+
+function renderMental(){
+  const container=document.getElementById('mental-content');
+  const today=new Date().toISOString().split('T')[0];
+  const mk=(field)=>`tp3_mental_${today}_${field}`;
+
+  const sections=[
+    {id:'morgen',icon:'🌅',title:'Morgens – Intention & Start',fields:[
+      {type:'text',key:'fokus',label:'Mein Fokus heute ist…'},
+      {type:'text',key:'ziel1',label:'Ziel 1 heute'},{type:'text',key:'ziel2',label:'Ziel 2 heute'},{type:'text',key:'ziel3',label:'Ziel 3 heute'},
+      {type:'timer',key:'atem_morgen',label:'2 Min. Atemübung',dur:120,timerKey:'atem_morgen'},
+      {type:'affirmation',key:'affirmation',label:'Affirmation des Tages'},
+    ]},
+    {id:'vortraining',icon:'💪',title:'Vor dem Training',fields:[
+      {type:'text',key:'warum',label:'Ich trainiere heute, weil…'},
+      {type:'check',key:'powerposen',label:'Power-Pose / Aktivierungsritual (30 Sek. stabil stehen, Schultern zurück, tief atmen)'},
+      {type:'text',key:'vision',label:'Ich sehe mich schon, wie ich…'},
+    ]},
+    {id:'nachtraining',icon:'🏆',title:'Nach dem Training',fields:[
+      {type:'text',key:'gut',label:'Was lief heute gut?'},
+      {type:'text',key:'mitnehmen',label:'Was nehme ich mit für nächstes Mal?'},
+      {type:'check',key:'anerkennung',label:'„Ich habe heute das Beste gegeben" ✓'},
+    ]},
+    {id:'abend',icon:'🌙',title:'Abends – Reflexion',fields:[
+      {type:'text',key:'dank1',label:'Dankbarkeit 1'},{type:'text',key:'dank2',label:'Dankbarkeit 2'},{type:'text',key:'dank3',label:'Dankbarkeit 3'},
+      {type:'text',key:'stolz',label:'Was hat mich heute stolz gemacht?'},
+      {type:'text',key:'morgen_int',label:'Meine Intention für morgen…'},
+      {type:'timer',key:'atem_abend',label:'5 Min. Abend-Atemübung / Body Scan',dur:300,timerKey:'atem_abend'},
+    ]},
+  ];
+
+  let html='';
+  sections.forEach(sec=>{
+    html+=`<div class="mental-section">
+      <div class="mental-section-header" onclick="toggleMentalSec('${sec.id}')">
+        <span class="mental-section-icon">${sec.icon}</span>
+        <span class="mental-section-title">${sec.title}</span>
+        <span class="mental-section-toggle" id="menttog-${sec.id}">▾</span>
+      </div>
+      <div class="mental-body" id="mentbody-${sec.id}">`;
+    sec.fields.forEach(f=>{
+      const k=mk(f.key);
+      if(f.type==='text'){
+        html+=`<div class="mental-item">
+          <div class="mental-item-label">${f.label}</div>
+          <input type="text" value="${lv(k)}" placeholder="…" onchange="sv('${k}',this.value)">
+        </div>`;
+      }else if(f.type==='check'){
+        const done=lb(k);
+        html+=`<div class="mental-check-row">
+          <button class="mental-check-btn${done?' done':''}" id="mchk-${f.key}" onclick="toggleMentalCheck('${k}','${f.key}')">${done?'✓':'○'}</button>
+          <span style="font-size:13px;color:var(--text)">${f.label}</span>
+        </div>`;
+      }else if(f.type==='timer'){
+        const done=lb(k);
+        html+=`<div class="mental-item">
+          <div class="mental-check-row">
+            <button class="mental-check-btn${done?' done':''}" id="mchk-${f.key}" onclick="toggleMentalCheck('${k}','${f.key}')">${done?'✓':'○'}</button>
+            <span style="font-size:13px;color:var(--text)">${f.label}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <button class="mental-timer-btn" id="mentimer-${f.timerKey}" onclick="startMentalTimer('${f.timerKey}',${f.dur},'${k}','${f.key}')">▶ Start</button>
+            <span class="mental-timer-disp" id="mentdisp-${f.timerKey}"></span>
+          </div>
+        </div>`;
+      }else if(f.type==='affirmation'){
+        const saved=lv(k);
+        html+=`<div class="mental-item">
+          <div class="mental-item-label">${f.label}</div>
+          <div class="affirmation-list">`;
+        AFFIRMATIONS.forEach((a,ai)=>{
+          html+=`<button class="affirmation-chip${saved===a?' sel':''}" onclick="selectAffirmation('${k}','${a.replace(/'/g,"\\'")}',this)">${a}</button>`;
+        });
+        html+=`</div>
+          <input type="text" value="${saved}" placeholder="Eigene Affirmation…" onchange="sv('${k}',this.value)">
+        </div>`;
+      }
+    });
+    html+=`</div></div>`;
+  });
+
+  // SOS Toolkit
+  html+=`<div class="sos-section">
+    <div class="sos-header" onclick="toggleSOS()">
+      <span style="font-size:18px">🆘</span>
+      <span class="sos-title">SOS – Stress & Gedankenkarussell</span>
+      <span id="sostog" style="margin-left:auto;font-size:16px;color:var(--red)">▾</span>
+    </div>
+    <div class="sos-body" id="sosbody">`;
+
+  const sosMk=(f)=>`tp3_sos_${new Date().toISOString().split('T')[0]}_${f}`;
+
+  // 4-7-8 Atem
+  html+=`<div class="sos-item">
+    <div class="sos-item-title">🫁 4-7-8 Atemtechnik</div>
+    <div class="sos-item-desc">4 Sek. einatmen → 7 Sek. halten → 8 Sek. ausatmen. 3 Runden.</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="mental-timer-btn" id="mentimer-478" onclick="start478Timer()">▶ Starten</button>
+      <span class="mental-timer-disp" id="mentdisp-478"></span>
+    </div>
+    <div class="sos-log-entry" id="soslog-478"></div>
+  </div>`;
+
+  // 5-4-3-2-1 Grounding
+  const groundDone=lb(sosMk('ground'));
+  html+=`<div class="sos-item">
+    <div class="sos-item-title">🌱 5-4-3-2-1 Grounding</div>
+    <div class="sos-item-desc">5 Dinge sehen · 4 hören · 3 fühlen · 2 riechen · 1 schmecken</div>
+    <div class="mental-check-row" style="margin-top:8px">
+      <button class="mental-check-btn${groundDone?' done':''}" id="mchk-ground" onclick="toggleSOSCheck('${sosMk('ground')}','ground')">${groundDone?'✓':'○'}</button>
+      <span style="font-size:12px;color:var(--muted)">Abgehakt = durchgeführt</span>
+    </div>
+  </div>`;
+
+  // Gedanken-Umformulierung
+  html+=`<div class="sos-item">
+    <div class="sos-item-title">💭 Gedanken-Umformulierung</div>
+    <input type="text" placeholder="Mein Gedanke war…" value="${lv(sosMk('gedanke'))}" onchange="sv('${sosMk('gedanke')}',this.value)" style="margin-bottom:6px">
+    <input type="text" placeholder="Ich wähle stattdessen…" value="${lv(sosMk('umformulierung'))}" onchange="sv('${sosMk('umformulierung')}',this.value)">
+  </div>`;
+
+  // Kurz-Bewegung
+  html+=`<div class="sos-item">
+    <div class="sos-item-title">🏃 Kurz-Bewegung (30 Sek.)</div>
+    <div class="sos-item-desc">Springen, Schütteln, Jumping Jacks – Energie entladen!</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="mental-timer-btn" id="mentimer-move" onclick="startMentalTimer('move',30,'${sosMk('move')}','move')">▶ 30 Sek.</button>
+      <span class="mental-timer-disp" id="mentdisp-move"></span>
+    </div>
+  </div>`;
+
+  html+=`</div></div>`;
+  container.innerHTML=html;
+}
+
+function toggleMentalSec(id){
+  const body=document.getElementById(`mentbody-${id}`);
+  const tog=document.getElementById(`menttog-${id}`);
+  const open=body.classList.toggle('open');
+  tog.classList.toggle('open',open);
+  tog.textContent=open?'▴':'▾';
+}
+
+function toggleSOS(){
+  const body=document.getElementById('sosbody');
+  const tog=document.getElementById('sostog');
+  const open=body.classList.toggle('open');
+  tog.textContent=open?'▴':'▾';
+}
+
+function toggleMentalCheck(k,btnId){
+  const nv=!lb(k);sb(k,nv);
+  const btn=document.getElementById(`mchk-${btnId}`);
+  if(btn){btn.className='mental-check-btn'+(nv?' done':'');btn.textContent=nv?'✓':'○';}
+}
+
+function toggleSOSCheck(k,btnId){toggleMentalCheck(k,btnId);}
+
+function selectAffirmation(k,text,el){
+  sv(k,text);
+  // Alle Chips deselektieren, dann diesen selektieren
+  el.closest('.affirmation-list').querySelectorAll('.affirmation-chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  // Auch im Input setzen
+  const input=el.closest('.mental-item').querySelector('input[type="text"]');
+  if(input)input.value=text;
+}
+
+function startMentalTimer(timerKey,dur,doneKey,btnId){
+  if(mentalTimers[timerKey])return;
+  let secs=dur;
+  const btn=document.getElementById(`mentimer-${timerKey}`);
+  const disp=document.getElementById(`mentdisp-${timerKey}`);
+  if(btn)btn.classList.add('running');
+  mentalTimers[timerKey]=setInterval(()=>{
+    const m=Math.floor(secs/60);const s=secs%60;
+    if(disp)disp.textContent=`${m}:${String(s).padStart(2,'0')}`;
+    if(secs<=0){
+      clearInterval(mentalTimers[timerKey]);delete mentalTimers[timerKey];
+      if(btn){btn.classList.remove('running');btn.textContent='✓ Fertig';}
+      if(disp)disp.textContent='';
+      sb(doneKey,true);
+      const chk=document.getElementById(`mchk-${btnId}`);
+      if(chk){chk.className='mental-check-btn done';chk.textContent='✓';}
+      if(navigator.vibrate)navigator.vibrate([200,100,200,100,200]);
+    }
+    secs--;
+  },1000);
+}
+
+// 4-7-8 Timer mit Führung
+function start478Timer(){
+  const btn=document.getElementById('mentimer-478');
+  const disp=document.getElementById('mentdisp-478');
+  if(btn.classList.contains('running'))return;
+  btn.classList.add('running');
+  const phases=[
+    {label:'Einatmen',dur:4},{label:'Halten',dur:7},{label:'Ausatmen',dur:8},
+    {label:'Einatmen',dur:4},{label:'Halten',dur:7},{label:'Ausatmen',dur:8},
+    {label:'Einatmen',dur:4},{label:'Halten',dur:7},{label:'Ausatmen',dur:8},
+  ];
+  let pi=0,secs=phases[0].dur;
+  if(disp)disp.textContent=phases[0].label+' '+secs;
+  const t=setInterval(()=>{
+    secs--;
+    if(secs<=0){
+      pi++;
+      if(pi>=phases.length){
+        clearInterval(t);btn.classList.remove('running');btn.textContent='✓ Fertig';
+        if(disp)disp.textContent='';
+        if(navigator.vibrate)navigator.vibrate([300,150,300]);
+        return;
+      }
+      secs=phases[pi].dur;
+    }
+    if(disp)disp.textContent=phases[pi].label+' '+secs;
+  },1000);
+}
+
+
+// =====================================================
+// AUFWÄRMEN – INTERAKTIVE KARTE
+// =====================================================
+
+// State-Keys für Aufwärmen
+const wuCardioDevk = (wi,di) => `tp3_w${wi}d${di}_wu_dev`;
+const wuCardioZeitk = (wi,di) => `tp3_w${wi}d${di}_wu_zeit`;
+const wuCardioDistk = (wi,di) => `tp3_w${wi}d${di}_wu_dist`;
+const wuCardioDonk = (wi,di) => `tp3_w${wi}d${di}_wu_done`;
+const wuExtrak = (wi,di) => `tp3_w${wi}d${di}_wu_extra`;
+
+// Splittet den Warmup-String in Cardio-Teil und Extra-Teil
+function parseWarmup(warmupStr) {
+  // Suche nach " + " als Trenner zwischen Cardio und Extra
+  const plusIdx = warmupStr.indexOf(' + ');
+  if (plusIdx === -1) return { cardio: warmupStr, extra: null };
+  return {
+    cardio: warmupStr.substring(0, plusIdx).trim(),
+    extra: warmupStr.substring(plusIdx + 3).trim()
+  };
+}
+
+function renderWarmupCard(wi, di, warmupStr) {
+  const CARDIO_DEVICES = ['Rudergerät','Laufband','Ski-Erg','Fahrrad / Bike','Crosstrainer','Sonstiges'];
+  const parsed = parseWarmup(warmupStr);
+  const savedDev = lv(wuCardioDevk(wi,di)) || 'Rudergerät';
+  const savedZeit = lv(wuCardioZeitk(wi,di));
+  const savedDist = lv(wuCardioDistk(wi,di));
+  const cardioDone = lb(wuCardioDonk(wi,di));
+  const extraDone = lb(wuExtrak(wi,di));
+
+  let html = `<div class="warmup-card">
+    <div class="warmup-top">
+      <span class="card-label">Aufwärmen</span>
+    </div>`;
+
+  // --- Cardio-Zeile ---
+  html += `<div class="warmup-cardio-row">
+    <select id="wudev-${wi}-${di}" onchange="sv(wuCardioDevk(${wi},${di}),this.value)">
+      ${CARDIO_DEVICES.map(d=>`<option${savedDev===d?' selected':''}>${d}</option>`).join('')}
+    </select>
+    <input type="number" inputmode="decimal" min="0" step="1" placeholder="Min." value="${savedZeit}"
+      id="wuzeit-${wi}-${di}" title="Dauer in Minuten"
+      onchange="sv(wuCardioZeitk(${wi},${di}),this.value)" onfocus="this.select()">
+    <span class="wunit">Min.</span>
+    <input type="number" inputmode="decimal" min="0" step="0.01" placeholder="km" value="${savedDist}"
+      id="wudist-${wi}-${di}" title="Distanz in km"
+      onchange="sv(wuCardioDistk(${wi},${di}),this.value)" onfocus="this.select()">
+    <span class="wunit">km</span>
+    <button class="warmup-cardio-check${cardioDone?' done':''}" id="wucardiobtn-${wi}-${di}"
+      onclick="toggleWuCardio(${wi},${di})">${cardioDone?'✓':'○'}</button>
+  </div>`;
+
+  // --- Extra-Aufwärmübung (falls vorhanden) ---
+  if (parsed.extra) {
+    html += `<div class="warmup-extra-row">
+      <button class="warmup-extra-check${extraDone?' done':''}" id="wuextrabtn-${wi}-${di}"
+        onclick="toggleWuExtra(${wi},${di})">${extraDone?'✓':'○'}</button>
+      <span class="warmup-extra-text">${parsed.extra}</span>
+    </div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function toggleWuCardio(wi, di) {
+  const k = wuCardioDonk(wi, di);
+  const nv = !lb(k); sb(k, nv);
+  const btn = document.getElementById(`wucardiobtn-${wi}-${di}`);
+  if (btn) { btn.className = 'warmup-cardio-check' + (nv?' done':''); btn.textContent = nv?'✓':'○'; }
+  checkDayDone(wi, di); updateGlobalProgress();
+}
+
+function toggleWuExtra(wi, di) {
+  const k = wuExtrak(wi, di);
+  const nv = !lb(k); sb(k, nv);
+  const btn = document.getElementById(`wuextrabtn-${wi}-${di}`);
+  if (btn) { btn.className = 'warmup-extra-check' + (nv?' done':''); btn.textContent = nv?'✓':'○'; }
+  checkDayDone(wi, di); updateGlobalProgress();
+}
+
+// =====================================================
 // INIT
+// =====================================================
 renderWeek();
 updateGlobalProgress();
 </script>
