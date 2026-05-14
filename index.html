@@ -1572,11 +1572,11 @@ function renderMental(){
   html+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 13px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
     <div style="flex:1">
       <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Mental-Score heute</div>
-      <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--purple)">${score}<span style="font-size:13px;color:var(--muted)">/100</span></div>
+      <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--purple)"><span id="mental-score-num">${score}</span><span style="font-size:13px;color:var(--muted)">/100</span></div>
     </div>
     <div style="width:50px;height:50px">
       <svg viewBox="0 0 36 36"><path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--border)" stroke-width="3"/>
-      <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--purple)" stroke-width="3" stroke-dasharray="${score},100" stroke-linecap="round"/></svg>
+      <path id="mental-score-ring" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--purple)" stroke-width="3" stroke-dasharray="${score},100" stroke-linecap="round"/></svg>
     </div>
   </div>`;
 
@@ -1744,16 +1744,42 @@ function shiftMentalDate(delta){
 
 function saveMentalScale(date,field,val){
   sv(mmk(date,field),val);
-  renderMental(); // re-render to update scale buttons + curve
+  // Nur die betroffenen Buttons aktualisieren
+  document.querySelectorAll(`[data-date="${date}"][data-field="${field}"]`).forEach(btn=>{
+    const bval=parseInt(btn.dataset.val);
+    const active=bval===val;
+    const isEnergy=field==='energie';
+    const isSchlaf=field==='schlafq';
+    if(isEnergy){
+      btn.style.borderColor=active?'var(--accent)':'var(--border)';
+      btn.style.background=active?'var(--accent-dim)':'transparent';
+      btn.style.color=active?'var(--accent)':'var(--muted)';
+    } else if(isSchlaf){
+      btn.style.borderColor=active?'var(--blue)':'var(--border)';
+      btn.style.background=active?'var(--blue-dim)':'transparent';
+      btn.style.color=active?'var(--blue)':'var(--muted)';
+    }
+  });
+  updateMentalScoreRing(date);
 }
 
 function toggleMentalCheckDate(k,date,field){
   const nv=!lb(k); sb(k,nv);
+  // Nur den Button aktualisieren – kein Re-render, Sektion bleibt offen
   const btn=document.getElementById(`mchk-${date}-${field}`);
   if(btn){btn.className='mental-check-btn'+(nv?' done':'');btn.textContent=nv?'✓':'○';}
-  // Update score ring without full re-render
+  // Score-Ring aktualisieren ohne alles neu aufzubauen
+  updateMentalScoreRing(date);
+}
+
+function updateMentalScoreRing(date){
   const score=getMentalScore(date);
-  renderMental();
+  // Score-Zahl
+  const numEl=document.getElementById('mental-score-num');
+  if(numEl) numEl.textContent=score;
+  // SVG Ring
+  const ringEl=document.getElementById('mental-score-ring');
+  if(ringEl) ringEl.setAttribute('stroke-dasharray',`${score},100`);
 }
 
 function selectAffirmationDate(k,el,text){
