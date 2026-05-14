@@ -296,6 +296,27 @@ header p{font-size:11px;color:var(--muted);}
 @keyframes badgePop{0%{transform:scale(.5);}70%{transform:scale(1.25);}100%{transform:scale(1);}}
 .badge-label{font-family:"DM Mono",monospace;font-size:9px;color:var(--muted);text-align:center;}
 
+
+/* ===== ÜBUNGS-INFO POPUP ===== */
+.info-btn{background:transparent;border:none;color:var(--muted);font-size:14px;padding:2px 4px;cursor:pointer;flex-shrink:0;transition:color .2s;line-height:1;}
+.info-btn:active{color:var(--accent);}
+.exercise-name-row{display:flex;align-items:center;gap:4px;}
+
+.info-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;align-items:flex-end;justify-content:center;}
+.info-overlay.open{display:flex;}
+.info-sheet{background:var(--surface);border-radius:16px 16px 0 0;padding:20px 18px 32px;width:100%;max-width:480px;max-height:75vh;overflow-y:auto;}
+.info-sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
+.info-sheet-title{font-size:17px;font-weight:500;color:var(--text);margin-bottom:4px;}
+.info-sheet-pattern{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+.info-sheet-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
+.info-sheet-muscles{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;}
+.muscle-tag{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+.info-sheet-links{display:flex;flex-direction:column;gap:8px;}
+.yt-link{display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(255,0,0,0.08);border:1px solid rgba(255,0,0,0.2);border-radius:var(--radius-sm);color:#ff4444;font-size:13px;font-weight:500;text-decoration:none;cursor:pointer;}
+.yt-link:active{opacity:.7;}
+.yt-link svg{width:20px;height:20px;flex-shrink:0;}
+.info-close-btn{display:block;width:100%;margin-top:14px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted);font-size:13px;font-family:'DM Mono',monospace;text-align:center;cursor:pointer;}
+
 /* ===== PRINT ===== */
 @media print{
   body{background:#fff;color:#000;padding-bottom:0;}
@@ -998,7 +1019,7 @@ function renderWeek(){
         <div class="exercise-header">
           <div class="pattern-chip ${ex.compound?'chip-compound':'chip-accessory'}">${ex.pat}</div>
           <div class="exercise-info">
-            <div class="exercise-name">${ex.name}</div>
+            <div class="exercise-name-row"><span class="exercise-name">${ex.name}</span><button class="info-btn" data-exname="${ex.name}" data-expat="${ex.pat}" title="Info &amp; Tutorial">ⓘ</button></div>
             <div class="exercise-detail">${ex.detail}</div>
             ${progressHtml}
           </div>
@@ -1898,10 +1919,721 @@ function startMentalTimer(timerKey,dur,doneKey,btnId){
 }
 
 
+// =====================================================
+// ÜBUNGSDATENBANK – Beschreibungen & YouTube-Links
+// =====================================================
+const EXERCISE_DB = {
+  // ── SQUAT ──────────────────────────────────────────
+  "Goblet Squat": {
+    desc: "Halte eine Kettlebell oder Hantel vor der Brust. Füße schulterbreit, Zehen leicht nach außen. Tief in die Hocke – Knie folgen den Zehen, Oberkörper aufrecht. Ideal zum Erlernen der Squat-Mechanik.",
+    muscles: ["Quadrizeps","Gluteus","Core","Obere Rückenmuskulatur"],
+    ytUrl: "https://www.youtube.com/results?search_query=Goblet+Squat+Technik+Deutsch"
+  },
+  "Front Squat": {
+    desc: "Langhantel liegt auf den vorderen Schultern, Ellbogen zeigen nach vorne und oben. Sehr aufrechte Körperhaltung nötig. Trainiert besonders Quadrizeps und Core intensiv.",
+    muscles: ["Quadrizeps","Gluteus","Core","Obere Rückenmuskulatur"],
+    ytUrl: "https://www.youtube.com/results?search_query=Front+Squat+Technik+Tutorial+Deutsch"
+  },
+  "Back Squat": {
+    desc: "Langhantel liegt auf dem oberen Rücken (High Bar) oder etwas tiefer (Low Bar). Der Klassiker für maximale Unterkörperkraft. Knie verfolgen die Zehenrichtung, Rücken bleibt neutral.",
+    muscles: ["Quadrizeps","Gluteus","Hamstrings","Unterer Rücken","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Back+Squat+Kniebeuge+Technik+Deutsch"
+  },
+  "Box Squat": {
+    desc: "Squat auf eine Box oder Bank. Du setzt dich kontrolliert ab, machst eine kurze Pause und explosiv zurück. Trainiert die Kraft aus dem tiefsten Punkt.",
+    muscles: ["Quadrizeps","Gluteus","Hamstrings"],
+    ytUrl: "https://www.youtube.com/results?search_query=Box+Squat+Technik+Deutsch"
+  },
+  "Hack Squat": {
+    desc: "An der Maschine: Rücken an der Rückenlehne, Füße auf der Plattform. Kontrolliert absenken und drücken. Sehr knieschonend, hohe Quadrizeps-Isolation.",
+    muscles: ["Quadrizeps","Gluteus"],
+    ytUrl: "https://www.youtube.com/results?search_query=Hack+Squat+Maschine+Technik"
+  },
+  "Leg Press": {
+    desc: "An der Beinpresse sitzen, Füße schulterbreit auf der Plattform. Knie nicht komplett strecken. Fußposition bestimmt Muskelbetonung: hoch = Gesäß, tief = Quadrizeps.",
+    muscles: ["Quadrizeps","Gluteus","Hamstrings"],
+    ytUrl: "https://www.youtube.com/results?search_query=Beinpresse+Technik+richtig+Deutsch"
+  },
+  "Heels-elevated Squat": {
+    desc: "Fersen auf einer kleinen Erhöhung (Gewichtsscheibe, Keil). Ermöglicht tieferes Absinken und stärkere Quadrizeps-Aktivierung. Perfekt bei eingeschränkter Knöchelbeweglichkeit.",
+    muscles: ["Quadrizeps","Gluteus"],
+    ytUrl: "https://www.youtube.com/results?search_query=Heels+elevated+squat+cyclist+squat+tutorial"
+  },
+  "Wall Sit": {
+    desc: "Rücken an der Wand, Oberschenkel parallel zum Boden (90°). Position halten. Isometrische Übung – kein Gelenk-Stress, hohe Quadrizeps-Ausdauer.",
+    muscles: ["Quadrizeps","Gluteus","Wade"],
+    ytUrl: "https://www.youtube.com/results?search_query=Wall+Sit+richtig+ausführen"
+  },
+  "Cossack Squat": {
+    desc: "Breiter Stand, eine Seite tief absenken – Knie gebeugt, anderes Bein gestreckt. Wechsel zwischen beiden Seiten. Exzellent für Hüftmobilität und Adduktoren.",
+    muscles: ["Adduktoren","Quadrizeps","Gluteus","Hüftmobilität"],
+    ytUrl: "https://www.youtube.com/results?search_query=Cossack+Squat+Tutorial+Deutsch"
+  },
+  "Sissy Squat": {
+    desc: "Fersen erhöht oder fixiert, Körper nach hinten neigen während die Knie nach vorne gleiten. Extreme Quadrizeps-Isolation. Nur mit guter Kniegesundheit.",
+    muscles: ["Quadrizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Sissy+Squat+Tutorial+Technik"
+  },
+  "Leg Extension": {
+    desc: "An der Maschine sitzen, Beine strecken bis zur vollen Extension, kontrolliert absenken. Isolation für den Quadrizeps. Kein Schwung!",
+    muscles: ["Quadrizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Beinstrecker+Maschine+Technik+richtig"
+  },
+  "Goblet Squat (leichter)": {
+    desc: "Klassischer Goblet Squat mit reduziertem Gewicht. Fokus auf Bewegungsqualität, langsames Tempo, keine Erschöpfung anstreben.",
+    muscles: ["Quadrizeps","Gluteus","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Goblet+Squat+Technik+Deutsch"
+  },
+  "Goblet Squat (Tempo)": {
+    desc: "Goblet Squat mit kontrolliertem Tempo: 4 Sekunden runter, 1 Sekunde halten, 2 Sekunden hoch. Steigert Time-under-Tension für Muskelaufbau.",
+    muscles: ["Quadrizeps","Gluteus","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Tempo+Squat+time+under+tension+tutorial"
+  },
+
+  // ── HINGE ──────────────────────────────────────────
+  "Romanian Deadlift (RDL)": {
+    desc: "Hüfte nach hinten schieben, Stange nah am Körper entlang. Rücken bleibt neutral, leichte Kniebeugung. Bis Dehnung in den Hamstrings spürbar – dann Hüfte zurückdrücken.",
+    muscles: ["Hamstrings","Gluteus","Unterer Rücken"],
+    ytUrl: "https://www.youtube.com/results?search_query=Romanian+Deadlift+Technik+Deutsch+RDL"
+  },
+  "Barbell Hip Thrust": {
+    desc: "Schulterblätter auf Bank, Stange über den Hüften (mit Polster). Hüfte explosiv nach oben drücken bis Körper gerade ist. Pause oben, Beckenneutralität halten.",
+    muscles: ["Gluteus maximus","Hamstrings","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Hip+Thrust+Technik+Deutsch+Langhantel"
+  },
+  "Conventional Deadlift": {
+    desc: "Füße hüftbreit, Stange über Mittelfuß. Hüfte und Knie gleichzeitig strecken, Stange nah am Körper. König der Kraftübungen – trainiert den gesamten hinteren Kettenzug.",
+    muscles: ["Hamstrings","Gluteus","Unterer Rücken","Trapez","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Kreuzheben+Technik+Deutsch+Conventional+Deadlift"
+  },
+  "Trap Bar Deadlift": {
+    desc: "Mit der Hex-Bar: Griffe seitlich, aufrechter Oberkörper als beim klassischen Kreuzheben. Knieschonender, einfacherer Einstieg ins schwere Zugtraining.",
+    muscles: ["Quadrizeps","Gluteus","Hamstrings","Rücken"],
+    ytUrl: "https://www.youtube.com/results?search_query=Trap+Bar+Deadlift+Hexbar+Technik+Tutorial"
+  },
+  "Kettlebell Swing": {
+    desc: "Füße schulterbreit, KB zwischen den Beinen. Hüfte explosiv nach vorne schnellen – nicht hochheben, sondern werfen. Die Kraft kommt ausschließlich aus der Hüfte, nicht den Armen.",
+    muscles: ["Gluteus","Hamstrings","Core","Schultern"],
+    ytUrl: "https://www.youtube.com/results?search_query=Kettlebell+Swing+Technik+Deutsch+Tutorial"
+  },
+  "Sumo Deadlift": {
+    desc: "Breiter Stand, Zehen weit nach außen. Hände greifen innen an der Stange. Kürzerer Weg, weniger Rückenbelastung als konventionell. Betont Adduktoren und Gluteus stärker.",
+    muscles: ["Adduktoren","Gluteus","Hamstrings","Rücken"],
+    ytUrl: "https://www.youtube.com/results?search_query=Sumo+Deadlift+Technik+Deutsch+Tutorial"
+  },
+  "Single-leg RDL (KB)": {
+    desc: "Einbeiniges RDL mit Kettlebell. Standbein leicht gebeugt, Oberkörper und freies Bein neigen gleichzeitig – wie eine Waage. Trainiert Balance und Hüftstabilität intensiv.",
+    muscles: ["Hamstrings","Gluteus","Stabilisatoren"],
+    ytUrl: "https://www.youtube.com/results?search_query=Single+Leg+RDL+Einbeiniges+Kreuzheben+Tutorial"
+  },
+  "B-stance RDL": {
+    desc: "Ein Fuß etwas zurückgesetzt als Stützfuß, Hauptarbeit macht das vordere Bein. Halbseitige Variante zwischen zweibeinigem RDL und Single-Leg. Gut für Asymmetrie-Ausgleich.",
+    muscles: ["Hamstrings","Gluteus","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=B-stance+RDL+tutorial+technique"
+  },
+  "Nordic Hamstring Curl": {
+    desc: "Knien, Füße fixiert, Oberkörper so langsam wie möglich nach vorne fallen lassen – Hamstrings bremsen exzentrisch. Fängt mit den Händen auf, zurückdrücken. Eine der effektivsten Hamstring-Übungen überhaupt.",
+    muscles: ["Hamstrings","Gluteus"],
+    ytUrl: "https://www.youtube.com/results?search_query=Nordic+Hamstring+Curl+Tutorial+Deutsch"
+  },
+  "Glute Bridge": {
+    desc: "Rückenlage, Füße aufgestellt. Hüfte nach oben drücken bis Körper eine Linie bildet. Gluteus oben maximal anspannen, 1-2 Sekunden halten. Sanfte Alternative zum Hip Thrust.",
+    muscles: ["Gluteus","Hamstrings","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Glute+Bridge+richtig+ausführen+Deutsch"
+  },
+  "45° Back Extension": {
+    desc: "Am 45°-Gerät: Hüften auf der Polsterung, Oberkörper hängt nach unten, dann aufrichten. Rückenstrecker, Gluteus und Hamstrings gleichzeitig. Rücken immer neutral halten.",
+    muscles: ["Unterer Rücken","Gluteus","Hamstrings"],
+    ytUrl: "https://www.youtube.com/results?search_query=Back+Extension+Rückenstrecker+Technik+Deutsch"
+  },
+  "Single-leg Hip Thrust (KB)": {
+    desc: "Einbeiniger Hip Thrust mit Kettlebell. Schultergürtel auf Bank, ein Fuß aufgestellt, anderes Bein gestreckt. Maximale Gluteus-Isolation pro Seite.",
+    muscles: ["Gluteus maximus","Hamstrings"],
+    ytUrl: "https://www.youtube.com/results?search_query=Single+Leg+Hip+Thrust+Tutorial+Technik"
+  },
+  "Good Morning": {
+    desc: "Stange auf dem oberen Rücken wie beim Squat. Hüfte nach hinten schieben, Oberkörper nach vorne neigen – Rücken gerade. Dehnt Hamstrings, stärkt Rückenstrecker. Leichtes Gewicht!",
+    muscles: ["Hamstrings","Unterer Rücken","Gluteus"],
+    ytUrl: "https://www.youtube.com/results?search_query=Good+Morning+Übung+Technik+Deutsch"
+  },
+  "Reverse Hyper": {
+    desc: "Am Reverse-Hyper-Gerät oder einer hohen Bank: Beine hängen, Hüfte nach oben schwingen und kontrolliert absenken. Dekomprimiert die Lendenwirbelsäule – rückenfreundlich.",
+    muscles: ["Gluteus","Hamstrings","Unterer Rücken"],
+    ytUrl: "https://www.youtube.com/results?search_query=Reverse+Hyperextension+Tutorial+Technik"
+  },
+  "Stiff-leg Deadlift": {
+    desc: "Wie RDL aber mit fast komplett gestreckten Knien. Maximale Hamstring-Dehnung. Nur für fortgeschrittene Athleten mit guter Flexibilität. Leichteres Gewicht als konventionell.",
+    muscles: ["Hamstrings","Gluteus","Unterer Rücken"],
+    ytUrl: "https://www.youtube.com/results?search_query=Stiff+Leg+Deadlift+Tutorial+Technik+Deutsch"
+  },
+  "RDL (BB)": {
+    desc: "Romanian Deadlift mit Langhantel. Hüftscharnier-Bewegung: Stange nah am Körper, Rücken neutral, Hüfte nach hinten. Bis zur Dehnung in den Hamstrings absenken.",
+    muscles: ["Hamstrings","Gluteus","Unterer Rücken"],
+    ytUrl: "https://www.youtube.com/results?search_query=Romanian+Deadlift+Langhantel+Technik+Deutsch"
+  },
+  "KB Deadlift": {
+    desc: "Kettlebell zwischen den Füßen, Hüfte senken, Rücken gerade, KB greifen und Hüfte strecken. Einsteigerfreundliches Kreuzheben – perfekt für Technikfokus.",
+    muscles: ["Gluteus","Hamstrings","Rücken","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Kettlebell+Deadlift+Tutorial+Technik+Deutsch"
+  },
+  "B-stance Hip Thrust (BB)": {
+    desc: "Hip Thrust mit einem Fuß als Hauptstütze, anderer als leichte Unterstützung. Asymmetrische Belastung für Seiten-Ausgleich, höhere Gluteus-Aktivierung pro Seite.",
+    muscles: ["Gluteus","Hamstrings"],
+    ytUrl: "https://www.youtube.com/results?search_query=B+stance+Hip+Thrust+Tutorial+technique"
+  },
+
+  // ── LUNGE ──────────────────────────────────────────
+  "Reverse Lunge": {
+    desc: "Schritt nach hinten, hinteres Knie senkt sich kontrolliert Richtung Boden. Oberkörper aufrecht. Knieschonender als der klassische Ausfallschritt vorwärts.",
+    muscles: ["Quadrizeps","Gluteus","Hamstrings","Stabilisatoren"],
+    ytUrl: "https://www.youtube.com/results?search_query=Reverse+Lunge+Rückwärtsausfallschritt+Technik+Deutsch"
+  },
+  "Bulgarian Split Squat": {
+    desc: "Hinterer Fuß auf einer Bank, vorderer Fuß einen großen Schritt entfernt. Tief absenken, vorderes Knie über dem Fuß. Eine der besten Einbeinübungen – fordert Balance und Kraft.",
+    muscles: ["Quadrizeps","Gluteus","Hamstrings","Hüftbeuger"],
+    ytUrl: "https://www.youtube.com/results?search_query=Bulgarian+Split+Squat+Technik+Deutsch+Tutorial"
+  },
+  "Walking Lunge": {
+    desc: "Ausfallschritte vorwärts mit Schrittwechsel – kontinuierliche Bewegung. Mit Körpergewicht oder Kurzhanteln. Trainiert Gleichgewicht und Koordination zusätzlich zur Kraft.",
+    muscles: ["Quadrizeps","Gluteus","Hamstrings","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Walking+Lunge+Technik+Deutsch+Tutorial"
+  },
+  "Lateral Lunge": {
+    desc: "Seitlicher Ausfallschritt: ein Bein seitwärts treten, in die Hocke auf dieser Seite, anderes Bein gestreckt. Frontalebene – trainiert Adduktoren und seitliche Hüftmuskulatur.",
+    muscles: ["Adduktoren","Gluteus","Quadrizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Lateral+Lunge+Seitlicher+Ausfallschritt+Tutorial+Deutsch"
+  },
+  "Front-foot elevated Split Squat": {
+    desc: "Vorderer Fuß auf einer kleinen Erhöhung (5-10cm). Ermöglicht tieferes Absenken, mehr Knie-Flexion, stärkere Quadrizeps-Dehnung. Schwieriger als normaler Split Squat.",
+    muscles: ["Quadrizeps","Gluteus","Hüftbeuger"],
+    ytUrl: "https://www.youtube.com/results?search_query=Front+foot+elevated+split+squat+tutorial+technique"
+  },
+  "Step-up (BB)": {
+    desc: "Mit Langhantel auf einer Box oder Bank aufsteigen. Das vordere Bein macht die Arbeit – kein Abstoß mit dem hinteren Fuß. Trainiert Einbein-Kraft und Gleichgewicht.",
+    muscles: ["Gluteus","Quadrizeps","Hamstrings"],
+    ytUrl: "https://www.youtube.com/results?search_query=Step+Up+Übung+Technik+Deutsch+Tutorial"
+  },
+  "Pistol Squat": {
+    desc: "Einbeinige tiefe Kniebeuge – freies Bein gestreckt nach vorne. Extreme Balance- und Kraftanforderung. Assistiert mit TRX oder Widerstandsband beginnen.",
+    muscles: ["Quadrizeps","Gluteus","Stabilisatoren","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Pistol+Squat+Tutorial+Progression+Deutsch"
+  },
+  "Skater Squat": {
+    desc: "Einbeinige Kniebeuge, hinteres Knie sinkt kontrolliert Richtung Boden ohne abzusetzen. Ähnlich dem Pistol Squat aber freundlicher für die Hüfte. Exzellente Einbein-Übung.",
+    muscles: ["Quadrizeps","Gluteus","Stabilisatoren"],
+    ytUrl: "https://www.youtube.com/results?search_query=Skater+Squat+Tutorial+Single+Leg+Squat"
+  },
+  "B-stance Squat (KB)": {
+    desc: "Ein Fuß etwas zurückgesetzt als leichte Unterstützung, Hauptbein führt die Kniebeuge durch. Halbseitige Übung zwischen zweibeining und einbeinig.",
+    muscles: ["Quadrizeps","Gluteus"],
+    ytUrl: "https://www.youtube.com/results?search_query=B+stance+squat+tutorial+technique+asymmetrical"
+  },
+  "Curtsy Lunge": {
+    desc: "Ausfallschritt, bei dem das hintere Bein hinter dem vorderen Bein überkreuzt wird (wie ein Knicks). Trainiert den Gluteus medius sehr effektiv.",
+    muscles: ["Gluteus medius","Gluteus maximus","Quadrizeps","Adduktoren"],
+    ytUrl: "https://www.youtube.com/results?search_query=Curtsy+Lunge+Tutorial+Technik+Deutsch"
+  },
+  "Slider Reverse Lunge": {
+    desc: "Hinterer Fuß auf einem Gleiter (Slider/Tuch auf glattem Boden). Fuß gleitet nach hinten statt abgehoben zu werden. Sanftere Kniebewegung, gute Hüftbeuger-Dehnung.",
+    muscles: ["Quadrizeps","Gluteus","Hüftbeuger"],
+    ytUrl: "https://www.youtube.com/results?search_query=Slider+Reverse+Lunge+Tutorial+Valslide"
+  },
+  "Loaded Step-up (BB)": {
+    desc: "Wie normaler Step-up aber mit Langhantel auf dem Rücken. Erhöhte Belastung fordert mehr Stabilität. Schrittbox nicht zu hoch (Oberschenkel max. parallel).",
+    muscles: ["Gluteus","Quadrizeps","Hamstrings"],
+    ytUrl: "https://www.youtube.com/results?search_query=Barbell+Step+Up+Tutorial+Technique"
+  },
+
+  // ── PUSH VERTIKAL ──────────────────────────────────
+  "DB Press stehend": {
+    desc: "Stehend mit Kurzhanteln über den Kopf drücken. Core muss aktiv stabilisieren – kein Hohlkreuz! Kontrolliert absenken bis Ellbogen auf Schulterhöhe.",
+    muscles: ["Schulter","Trizeps","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Schulterdrücken+stehend+Kurzhantel+Technik+Deutsch"
+  },
+  "DB Press sitzend": {
+    desc: "Sitzend mit Kurzhanteln über den Kopf drücken. Stabiler als stehend, ermöglicht mehr Fokus auf die Schulter. Rücken an der Rückenlehne oder aufrecht frei sitzend.",
+    muscles: ["Schulter","Trizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Schulterdrücken+sitzend+Kurzhantel+Technik+Deutsch"
+  },
+  "Push Press": {
+    desc: "Leichter Kniebeugeimpuls gibt der Stange Schwung, dann Arme strecken. Verbindet Bein- und Schulterkraft. Mehr Gewicht möglich als beim Strict Press.",
+    muscles: ["Schulter","Trizeps","Beine","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Push+Press+Technik+Tutorial+Deutsch"
+  },
+  "Z-Press (BB)": {
+    desc: "Sitzend auf dem Boden, Beine gestreckt vor sich, Stange über den Kopf drücken. Kein Rücken-Support – maximale Core- und Schulterstabilitätsanforderung.",
+    muscles: ["Schulter","Trizeps","Core","Hüftbeuger"],
+    ytUrl: "https://www.youtube.com/results?search_query=Z+Press+Barbell+Tutorial+Technique+Seated"
+  },
+  "Arnold Press": {
+    desc: "Start mit Handflächen zu dir, beim Drücken nach außen rotieren. Erfunden von Arnold Schwarzenegger. Trainiert alle drei Schulterköpfe durch die Rotation.",
+    muscles: ["Schulter (alle Köpfe)","Trizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Arnold+Press+Technik+Tutorial+Deutsch"
+  },
+  "Lateral Raise": {
+    desc: "Arme seitlich bis Schulterhöhe heben, leicht gebeugte Ellbogen. Kontrolliert absenken – kein Schwung! Isoliert den seitlichen Schulterkopf für Schulterbreite.",
+    muscles: ["Schulter (medial)"],
+    ytUrl: "https://www.youtube.com/results?search_query=Seitheben+Lateral+Raise+Technik+Deutsch"
+  },
+  "Y-raise": {
+    desc: "Oberkörper nach vorne geneigt, Arme in Y-Form heben (diagonal vorwärts-oben). Aktiviert Trapezmuskel und hintere Schulter. Wichtig für Haltung und Schultergesundheit.",
+    muscles: ["Trapez","Hintere Schulter","Rhomboiden"],
+    ytUrl: "https://www.youtube.com/results?search_query=Y+raise+exercise+shoulder+tutorial+technique"
+  },
+  "Plate Halo": {
+    desc: "Gewichtsscheibe mit beiden Händen halten, langsam um den Kopf kreisen lassen. Mobilisiert die Schulter in allen Ebenen, stärkt Rotatorenmanschette.",
+    muscles: ["Schulter","Rotatorenmanschette","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Plate+Halo+Exercise+Tutorial+Shoulder"
+  },
+  "Half-kneeling Single-arm Press": {
+    desc: "Im Einknien-Stand (ein Knie am Boden) einseitig drücken. Aktiviert den Gluteus des unteren Beins, verhindert Ausweichbewegungen. Sehr gut für Körperbalance.",
+    muscles: ["Schulter","Trizeps","Core","Gluteus"],
+    ytUrl: "https://www.youtube.com/results?search_query=Half+Kneeling+Single+Arm+Press+Tutorial"
+  },
+  "Landmine Press": {
+    desc: "Stange in einer Ecke oder Landmine-Halterung. Halbkreisbewegung nach oben-vorne. Schulterfreundlich, gut für einseitiges Training, einfach zu erlernen.",
+    muscles: ["Schulter","Trizeps","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Landmine+Press+Tutorial+Technik+Deutsch"
+  },
+  "Tall-kneeling Press (BB)": {
+    desc: "Aufrecht kniend (beide Knie am Boden), Stange über den Kopf drücken. Hüfte gestreckt halten – kein Hohlkreuz. Maximaler Core-Einsatz, keine Bein-Unterstützung.",
+    muscles: ["Schulter","Trizeps","Core","Hüftbeuger"],
+    ytUrl: "https://www.youtube.com/results?search_query=Tall+Kneeling+Press+Tutorial+Barbell"
+  },
+
+  // ── PUSH HORIZONTAL ────────────────────────────────
+  "Barbell Bench Press (flach)": {
+    desc: "Der Klassiker. Schulterblätter zusammengezogen auf Bank, Stange kontrolliert zur Brust absenken. Ellbogen ca. 45-75° zum Körper. Brustmuskeln, Trizeps, vordere Schulter.",
+    muscles: ["Brustmuskeln","Trizeps","Vordere Schulter"],
+    ytUrl: "https://www.youtube.com/results?search_query=Bankdrücken+Technik+Deutsch+Langhantel+Tutorial"
+  },
+  "Incline Bench Press (BB)": {
+    desc: "Schrägbank bei 30-45°. Obere Brust und vordere Schulter mehr betont. Sonst gleiche Technik wie flaches Bankdrücken. Schulterblätter bleiben retrahiert.",
+    muscles: ["Obere Brustmuskeln","Vordere Schulter","Trizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Schrägbankdrücken+aufwärts+Technik+Deutsch"
+  },
+  "Flat DB Press": {
+    desc: "Bankdrücken mit Kurzhanteln. Größerer Bewegungsradius als mit Stange möglich. Jede Seite arbeitet unabhängig – gut für Asymmetrie-Ausgleich.",
+    muscles: ["Brustmuskeln","Trizeps","Vordere Schulter"],
+    ytUrl: "https://www.youtube.com/results?search_query=Bankdrücken+Kurzhantel+flach+Technik+Deutsch"
+  },
+  "Close-grip Bench Press": {
+    desc: "Enger Griff (ca. schulterbreit) beim Bankdrücken. Verlagert Fokus stark auf Trizeps und innere Brust. Ellbogen nah am Körper halten.",
+    muscles: ["Trizeps","Innere Brustmuskeln","Vordere Schulter"],
+    ytUrl: "https://www.youtube.com/results?search_query=Close+Grip+Bench+Press+enger+Griff+Technik+Deutsch"
+  },
+  "Floor Press (BB)": {
+    desc: "Bankdrücken auf dem Boden. Bewegungsumfang durch den Boden begrenzt – schonender für die Schulter. Pausiert am Boden, dann explosive Streckung.",
+    muscles: ["Brustmuskeln","Trizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Floor+Press+Boden+Bankdrücken+Tutorial+Technik"
+  },
+  "Push-up": {
+    desc: "Liegestütz: Körper bildet eine gerade Linie, Hände etwas breiter als schulterbreit. Kontrolliert absenken bis Brust fast den Boden berührt. Der Klassiker für überall.",
+    muscles: ["Brustmuskeln","Trizeps","Schulter","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Liegestütz+richtig+ausführen+Technik+Deutsch"
+  },
+  "Single-arm DB Bench Press": {
+    desc: "Bankdrücken mit nur einer Kurzhantel. Die andere Seite muss aktiv stabilisieren. Trainiert Anti-Rotation des Cores zusätzlich zur Druckkraft.",
+    muscles: ["Brustmuskeln","Trizeps","Core (Anti-Rotation)"],
+    ytUrl: "https://www.youtube.com/results?search_query=Single+Arm+Dumbbell+Bench+Press+Tutorial"
+  },
+  "DB Fly (flach)": {
+    desc: "Mit Kurzhanteln flach auf Bank: Arme weit öffnen (Dehnung in der Brust), dann bogenförmig zusammenführen. Ellbogen leicht gebeugt. Isolation für die Brustmuskeln.",
+    muscles: ["Brustmuskeln (Dehnung)"],
+    ytUrl: "https://www.youtube.com/results?search_query=Kurzhantel+Fliegende+flach+Butterfly+Technik+Deutsch"
+  },
+  "Cable Fly": {
+    desc: "Am Kabelzug: Griffe auf Höhe der Bank, bogenförmig vor dem Körper zusammenführen. Konstante Spannung über den ganzen Bewegungsweg – sehr effektiv für Brustdefinition.",
+    muscles: ["Brustmuskeln","Vordere Schulter"],
+    ytUrl: "https://www.youtube.com/results?search_query=Kabelzug+Fliegende+Cable+Fly+Technik+Deutsch"
+  },
+  "Incline DB Fly": {
+    desc: "Schräg-Fliegende mit Kurzhanteln auf erhöhter Bank (30-45°). Obere Brust betont. Kontrollierte Dehnung, kein Überstrecken der Schulter.",
+    muscles: ["Obere Brustmuskeln"],
+    ytUrl: "https://www.youtube.com/results?search_query=Incline+Dumbbell+Fly+Schrägbank+Tutorial+Deutsch"
+  },
+  "Pec Deck": {
+    desc: "An der Butterfly-Maschine: Arme in die Pads, zusammendrücken und kontrolliert öffnen. Einfache Isolation für Brustmuskeln, schulterfreundlich durch geführte Bewegung.",
+    muscles: ["Brustmuskeln"],
+    ytUrl: "https://www.youtube.com/results?search_query=Butterfly+Maschine+Pec+Deck+Technik+Deutsch"
+  },
+  "Diamond Push-up": {
+    desc: "Liegestütz mit Händen nah zusammen (Daumen und Zeigefinger bilden Raute). Sehr hohe Trizeps-Aktivierung, innere Brust. Anspruchsvoller als normaler Liegestütz.",
+    muscles: ["Trizeps","Innere Brust"],
+    ytUrl: "https://www.youtube.com/results?search_query=Diamond+Push+Up+Rauten+Liegestütz+Tutorial"
+  },
+
+  // ── PULL VERTIKAL ──────────────────────────────────
+  "Lat Pulldown (neutraler Griff)": {
+    desc: "Am Kabelzug mit parallelen Griffen (Handflächen zueinander). Stange/Griff zur Brust ziehen, Schulterblätter zusammenziehen. Neutraler Griff schont die Schulter.",
+    muscles: ["Latissimus","Bizeps","Rhomboiden"],
+    ytUrl: "https://www.youtube.com/results?search_query=Lat+Pulldown+neutraler+Griff+Technik+Deutsch"
+  },
+  "Pull-up (assistiert)": {
+    desc: "Klimmzug mit Unterstützung (Band oder Maschine). Schulterblätter erst zusammenziehen, dann Ellbogen nach unten ziehen. Brust zum Griff, nicht Kinn über die Stange.",
+    muscles: ["Latissimus","Bizeps","Rhomboiden","Teres major"],
+    ytUrl: "https://www.youtube.com/results?search_query=Klimmzug+assistiert+Band+Progressionen+Deutsch"
+  },
+  "Weighted Pull-up": {
+    desc: "Klimmzug mit Zusatzgewicht (Gürtel, Weste oder KB zwischen den Beinen). Gleiche Technik, erhöhte Last. Für Fortgeschrittene mit sauberer Grundtechnik.",
+    muscles: ["Latissimus","Bizeps","Rhomboiden"],
+    ytUrl: "https://www.youtube.com/results?search_query=Weighted+Pull+Up+Klimmzug+Zusatzgewicht+Tutorial"
+  },
+  "Chin-up": {
+    desc: "Klimmzug mit supiniertem Griff (Handflächen zeigen zu dir). Bizeps stärker eingebunden als beim Overhand Pull-up. Oft zugänglicher für Einsteiger.",
+    muscles: ["Bizeps","Latissimus","Rhomboiden"],
+    ytUrl: "https://www.youtube.com/results?search_query=Chin+Up+Untergriff+Klimmzug+Technik+Deutsch"
+  },
+  "Neutral-grip Pull-up": {
+    desc: "Parallele Griffe (Handflächen zueinander). Schulterfreundlichste Klimmzug-Variante. Gleiche Zugkraft wie Chin-up mit weniger Schulterbelastung.",
+    muscles: ["Latissimus","Bizeps","Rhomboiden"],
+    ytUrl: "https://www.youtube.com/results?search_query=Neutral+Grip+Pull+Up+Parallel+Tutorial"
+  },
+  "Lat Pulldown (weiter Griff)": {
+    desc: "Breiter Griff am Kabelzug, Stange zur Brust (nicht hinter den Kopf!). Breiter Griff betont die Außenfasern des Latissimus – sorgt für Schulterbreite.",
+    muscles: ["Latissimus (weit)","Bizeps","Rhomboiden"],
+    ytUrl: "https://www.youtube.com/results?search_query=Lat+Pulldown+weiter+Griff+Technik+Deutsch"
+  },
+  "Straight-arm Pulldown": {
+    desc: "Am Kabelzug stehend, Arme gestreckt von oben nach unten ziehen. Reine Latissimus-Isolation ohne Bizeps. Arm bleibt fast komplett gestreckt während der ganzen Bewegung.",
+    muscles: ["Latissimus","Teres major"],
+    ytUrl: "https://www.youtube.com/results?search_query=Straight+Arm+Pulldown+Lat+Isolation+Tutorial+Deutsch"
+  },
+  "Scapular Pull-up": {
+    desc: "Hängen an der Stange, Arme gestreckt. Nur Schulterblätter zusammenziehen und nach unten bewegen – kein Ellbogeneinsatz. Grundlage für jeden Klimmzug, Schultergesundheit.",
+    muscles: ["Schulterblatt-Stabilisatoren","Trapez unten","Rhomboiden"],
+    ytUrl: "https://www.youtube.com/results?search_query=Scapular+Pull+Up+Schulterblatt+Tutorial+Technik"
+  },
+  "Cable Pullover (DB)": {
+    desc: "Liegend auf Bank mit Kurzhantel oder am Kabelzug: Arme gestreckt hinter dem Kopf, bogenförmig über die Brust ziehen. Latissimus-Dehnung und -Kontraktion.",
+    muscles: ["Latissimus","Teres major","Trizeps langer Kopf"],
+    ytUrl: "https://www.youtube.com/results?search_query=Pullover+Kurzhantel+Kabelzug+Technik+Tutorial+Deutsch"
+  },
+  "Banded Lat Pulldown": {
+    desc: "Widerstandsband über einem Fixpunkt. Lat Pulldown Bewegung nachahmen. Perfekt für Zuhause oder als Aufwärm-/Mobilisierungsübung.",
+    muscles: ["Latissimus","Bizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Resistance+Band+Lat+Pulldown+Tutorial"
+  },
+  "Half-kneeling Cable Pulldown": {
+    desc: "Im Einknien am Kabelzug: einseitiger Pulldown. Trainiert Stabilität und Lat gleichzeitig. Core muss Rotation verhindern.",
+    muscles: ["Latissimus","Core (Anti-Rotation)","Gluteus"],
+    ytUrl: "https://www.youtube.com/results?search_query=Half+Kneeling+Cable+Pulldown+Tutorial+Single+Arm"
+  },
+  "Single-arm Lat Pulldown": {
+    desc: "Einseitiger Lat Pulldown am Kabelzug. Jede Seite arbeitet unabhängig – gut für Asymmetrie-Ausgleich. Core stabilisiert gegen die Rotation.",
+    muscles: ["Latissimus","Bizeps","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Single+Arm+Lat+Pulldown+Tutorial+Unilateral"
+  },
+
+  // ── PULL HORIZONTAL ────────────────────────────────
+  "Chest-supported DB Row": {
+    desc: "Auf einer geneigten Bank liegend (Brust auf der Bank) mit Kurzhanteln rudern. Kein Körperschwung möglich – reine Rückenarbeit. Ideal für Technikfokus.",
+    muscles: ["Mittlerer Rücken","Rhomboiden","Hintere Schulter","Bizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Chest+Supported+Row+Kurzhantel+Technik+Deutsch"
+  },
+  "Single-arm DB Row": {
+    desc: "Eine Hand auf Bank abstützen, Kurzhantel seitwärts nach oben ziehen. Ellbogen eng am Körper, Schulterblatt am Ende zusammenziehen. Klassisches Rudern.",
+    muscles: ["Latissimus","Rhomboiden","Hintere Schulter","Bizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Einarmiges+Rudern+Kurzhantel+Technik+Deutsch"
+  },
+  "Face Pull": {
+    desc: "Am Kabelzug mit Seilgriff auf Augenhöhe: Seil zum Gesicht ziehen, Ellbogen nach hinten-oben, externe Rotation der Schulter. Unverzichtbar für Schultergesundheit.",
+    muscles: ["Hintere Schulter","Rotatorenmanschette","Rhomboiden","Trapez"],
+    ytUrl: "https://www.youtube.com/results?search_query=Face+Pull+Kabelzug+Technik+Deutsch+Tutorial+Schulter"
+  },
+  "Barbell Bent-over Row": {
+    desc: "Oberkörper ca. 45° nach vorne geneigt, Stange zum Bauch/Unterbrust ziehen. Rücken neutral! Eine der besten Übungen für Rückendicke und Kraft.",
+    muscles: ["Mittlerer Rücken","Latissimus","Rhomboiden","Bizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Langhantelrudern+vorgebeugt+Technik+Deutsch+Tutorial"
+  },
+  "Seated Cable Row": {
+    desc: "Am Kabelzug sitzend, Griff zum Bauch ziehen, Ellbogen nach hinten, Schulterblätter am Ende zusammenziehen. Konstante Spannung, verschiedene Griffe möglich.",
+    muscles: ["Mittlerer Rücken","Latissimus","Bizeps","Rhomboiden"],
+    ytUrl: "https://www.youtube.com/results?search_query=Kabelrudern+sitzend+Technik+Deutsch+Tutorial"
+  },
+  "T-bar Row": {
+    desc: "Mit der T-Bar oder Landmine: Stange zwischen den Beinen, Griff und ziehen. Erlaubt schwere Gewichte, trainiert massiven Rückenaufbau.",
+    muscles: ["Mittlerer Rücken","Latissimus","Rhomboiden","Bizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=T-Bar+Rudern+Technik+Deutsch+Tutorial"
+  },
+  "Inverted Row": {
+    desc: "Körper unter einer Stange oder TRX-Schlaufen. Brust zur Stange ziehen, Körper gerade halten. Skalierbar: flacher = schwerer. Bodyweight Rudern.",
+    muscles: ["Mittlerer Rücken","Bizeps","Rhomboiden","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Inverted+Row+TRX+Rudern+Technik+Deutsch"
+  },
+  "Pendlay Row": {
+    desc: "Stange liegt zwischen den Sätzen komplett auf dem Boden. Explosiver Zug aus dem Stillstand, Oberkörper parallel zum Boden. Hohe Kraft-Anforderung.",
+    muscles: ["Mittlerer Rücken","Latissimus","Trapez","Bizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Pendlay+Row+Tutorial+Technik+Dead+Stop"
+  },
+  "Rear Delt Fly (DB)": {
+    desc: "Oberkörper vorgebeugt, Kurzhanteln nach hinten-außen heben bis Schulterhöhe. Isoliert die hintere Schulter – wichtig für Schulterbalance und Haltung.",
+    muscles: ["Hintere Schulter","Rhomboiden","Trapez"],
+    ytUrl: "https://www.youtube.com/results?search_query=Hintere+Schulter+Kurzhantel+Reverse+Fly+Technik+Deutsch"
+  },
+  "Banded Pull-apart": {
+    desc: "Widerstandsband mit gestreckten Armen vor der Brust halten, auseinanderziehen bis zur Brust. Stärkt Schulterblatt-Retraktoren, verbessert Haltung. Ideal als Warm-up.",
+    muscles: ["Rhomboiden","Hintere Schulter","Trapez"],
+    ytUrl: "https://www.youtube.com/results?search_query=Band+Pull+Apart+Tutorial+Schultergesundheit+Deutsch"
+  },
+  "Single-arm Cable Row": {
+    desc: "Einseitiges Kabelrudern stehend oder sitzend. Core muss gegen Rotation arbeiten. Gut für Asymmetrie-Ausgleich und Rumpfstabilität.",
+    muscles: ["Latissimus","Rhomboiden","Core (Anti-Rotation)"],
+    ytUrl: "https://www.youtube.com/results?search_query=Single+Arm+Cable+Row+Tutorial+Technik+Unilateral"
+  },
+  "High Row (Kabel, Ellbogen weit)": {
+    desc: "Kabelzug auf Kopfhöhe, Seil zum Gesicht ziehen mit weit abgespreizten Ellbogen. Betont hintere Schulter und oberen Trapez stärker als normale Face Pulls.",
+    muscles: ["Hintere Schulter","Oberer Trapez","Rhomboiden"],
+    ytUrl: "https://www.youtube.com/results?search_query=High+Cable+Row+elbows+flared+tutorial+rear+delt"
+  },
+
+  // ── ROTATION ───────────────────────────────────────
+  "Half-kneeling Chop": {
+    desc: "Im Einknien-Stand am Kabelzug: Seil von oben diagonalförmig nach unten-außen ziehen. Trainiert Rotationskraft mit stabiler Basis. Wichtig für sportliche Bewegungen.",
+    muscles: ["Schräge Bauchmuskulatur","Core","Schulter"],
+    ytUrl: "https://www.youtube.com/results?search_query=Half+Kneeling+Chop+Cable+Tutorial+Core+Rotation"
+  },
+  "Cable Wood Chop": {
+    desc: "Am Kabelzug: Griff von oben außen diagonal nach unten innen ziehen (wie Holz hacken). Trainiert Rotationskraft durch alle Core-Schichten.",
+    muscles: ["Schräge Bauchmuskulatur","Core","Schulter","Hüfte"],
+    ytUrl: "https://www.youtube.com/results?search_query=Cable+Wood+Chop+Tutorial+Deutsch+Core+Rotation"
+  },
+  "Banded Standing Rotation": {
+    desc: "Band an einem Fixpunkt, stehend rotieren. Sanfte Variante der Rotationsübungen. Gut für Aufwärmen und Rehabilitation.",
+    muscles: ["Schräge Bauchmuskulatur","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Resistance+Band+Standing+Rotation+Core+Tutorial"
+  },
+  "Rotational Ball Throw": {
+    desc: "Mit einem Medizinball an der Wand: rotieren und Ball explosiv werfen. Trainiert Rotationspower – wichtig für Wurf-, Schlag- und Schlägersportarten.",
+    muscles: ["Core (Rotation)","Schulter","Hüfte"],
+    ytUrl: "https://www.youtube.com/results?search_query=Medizinball+rotational+throw+wall+tutorial+power"
+  },
+  "Cable Lift": {
+    desc: "Gegenteil zum Wood Chop: Kabel von unten diagonal nach oben-außen ziehen. Trainiert die aufsteigende Rotationskette.",
+    muscles: ["Core (Rotation)","Schulter","Hüfte"],
+    ytUrl: "https://www.youtube.com/results?search_query=Cable+Lift+Low+to+High+Core+Rotation+Tutorial"
+  },
+  "Landmine Rainbow": {
+    desc: "Stange in Landmine-Halterung, mit beiden Händen von einer Seite zur anderen führen (Halbkreis). Trainiert Schultern und Rotation in einem.",
+    muscles: ["Schulter","Core (Rotation)","Trizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Landmine+Rainbow+Tutorial+Exercise+Technique"
+  },
+  "Standing Cable Rotation": {
+    desc: "Am Kabelzug stehend, Griff mit gestreckten oder leicht gebeugten Armen rotieren. Hüfte bleibt stabil, Bewegung kommt aus der Wirbelsäule und dem Core.",
+    muscles: ["Schräge Bauchmuskulatur","Core"],
+    ytUrl: "https://www.youtube.com/results?search_query=Standing+Cable+Rotation+Core+Tutorial+Deutsch"
+  },
+  "Tall-kneeling Chop": {
+    desc: "Beide Knie am Boden, aufrecht knien. Kabel von oben nach unten-außen ziehen. Kein Bein-Einsatz, maximale Core- und Schulter-Stabilisierung nötig.",
+    muscles: ["Core","Schulter","Schräge Bauchmuskulatur"],
+    ytUrl: "https://www.youtube.com/results?search_query=Tall+Kneeling+Chop+Cable+Core+Tutorial"
+  },
+  "Lying Windshield Wiper": {
+    desc: "Rückenlage, Beine gestreckt nach oben, langsam zur Seite absenken und zurück (wie Scheibenwischer). Lendenwirbel bleibt am Boden! Intensive Rotation für den Core.",
+    muscles: ["Schräge Bauchmuskulatur","Core","Hüftbeuger"],
+    ytUrl: "https://www.youtube.com/results?search_query=Lying+Windshield+Wiper+Exercise+Core+Tutorial"
+  },
+
+  // ── ANTI-ROTATION / CORE ───────────────────────────
+  "Dead Bug": {
+    desc: "Rückenlage, Arme zur Decke, Knie 90° gebeugt in der Luft. Gegenüberliegende Arm-Bein-Kombination strecken und zurück – Lendenwirbel bleibt IMMER am Boden. Langsam!",
+    muscles: ["Tiefer Core","Transversus abdominis","Hüftbeuger"],
+    ytUrl: "https://www.youtube.com/results?search_query=Dead+Bug+Übung+Technik+richtig+Core+Deutsch"
+  },
+  "Pallof Press": {
+    desc: "Am Kabelzug seitlich stehend: Griff vor die Brust, dann nach vorne drücken und zurück. Der Kabelzug zieht dich zur Seite – du widerstehst. Anti-Rotations-Core-Training.",
+    muscles: ["Core (Anti-Rotation)","Schräge Bauchmuskulatur"],
+    ytUrl: "https://www.youtube.com/results?search_query=Pallof+Press+Tutorial+Anti+Rotation+Core+Deutsch"
+  },
+  "Bird Dog": {
+    desc: "Vierfüßlerstand: gegenüberliegende Arm-Bein-Kombination strecken, Rücken gerade halten. Langsam und kontrolliert. Exzellent für Rückengesundheit und Core-Stabilität.",
+    muscles: ["Rückenstrecker","Gluteus","Core","Schulter"],
+    ytUrl: "https://www.youtube.com/results?search_query=Bird+Dog+Übung+Technik+richtig+Core+Deutsch"
+  },
+  "Renegade Row": {
+    desc: "Liegestützposition mit Kurzhanteln, abwechselnd rudern. Hüfte bleibt stabil – kein Drehen! Kombiniert Push-Stabilität mit Pull-Kraft.",
+    muscles: ["Core (Anti-Rotation)","Rücken","Schulter","Trizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Renegade+Row+Tutorial+Technik+Deutsch+Core"
+  },
+  "Plank with Shoulder Tap": {
+    desc: "Liegestützposition halten, abwechselnd gegenüberliegende Schulter antippen. Hüfte stabil! Intensivierung des normalen Planks mit Anti-Rotationskomponente.",
+    muscles: ["Core","Schulter","Trizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Plank+Shoulder+Tap+Tutorial+Core+Anti+Rotation"
+  },
+  "Stir-the-pot": {
+    desc: "Unterarme auf einem Fitnessball, Kreisbewegungen mit dem Ball machen (wie Rühren). Extremes Core-Stabilitätstraining – der instabile Ball fordert alle Core-Muskeln.",
+    muscles: ["Gesamter Core","Schulter"],
+    ytUrl: "https://www.youtube.com/results?search_query=Stir+the+Pot+Exercise+Swiss+Ball+Core+Tutorial"
+  },
+  "Pallof Iso Hold": {
+    desc: "Pallof Press-Position halten (Arme nach vorne gestreckt) ohne Bewegung. Isometrische Anti-Rotation. Länger halten = schwieriger.",
+    muscles: ["Core (Anti-Rotation)","Schräge Bauchmuskulatur"],
+    ytUrl: "https://www.youtube.com/results?search_query=Pallof+Press+Isometric+Hold+Tutorial+Core"
+  },
+  "Bird Dog Row": {
+    desc: "Bird Dog Variation: Im Vierfüßler eine Kurzhantel rudern während gegenüberliegendes Bein gestreckt ist. Kombiniert Stabilität mit Zugkraft.",
+    muscles: ["Rücken","Core","Gluteus","Schulter"],
+    ytUrl: "https://www.youtube.com/results?search_query=Bird+Dog+Row+Dumbbell+Tutorial+Core+Exercise"
+  },
+  "Half-kneeling Pallof Press": {
+    desc: "Pallof Press im Einknien-Stand. Weniger Basis = mehr Stabilisierungsarbeit. Gluteus des unteren Beins aktiv halten.",
+    muscles: ["Core (Anti-Rotation)","Gluteus","Schräge Bauchmuskulatur"],
+    ytUrl: "https://www.youtube.com/results?search_query=Half+Kneeling+Pallof+Press+Tutorial+Anti+Rotation"
+  },
+  "Body Saw": {
+    desc: "Unterarmstütz (Plank), Körper vorwärts und rückwärts schieben wie eine Säge. Auf Schlitten, Slider oder glatter Fläche. Extremes Core-Training.",
+    muscles: ["Gesamter Core","Schulter","Hüftbeuger"],
+    ytUrl: "https://www.youtube.com/results?search_query=Body+Saw+Exercise+Plank+Tutorial+Core"
+  },
+
+  // ── TRIZEPS ────────────────────────────────────────
+  "Overhead Tricep Extension (DB)": {
+    desc: "Kurzhantel mit beiden Händen über den Kopf, Ellbogen zeigen nach vorne, Unterarme nach unten absenken und strecken. Betont den langen Trizeps-Kopf maximal.",
+    muscles: ["Trizeps (langer Kopf)"],
+    ytUrl: "https://www.youtube.com/results?search_query=Overhead+Trizeps+Extension+Kurzhantel+Technik+Deutsch"
+  },
+  "Tricep Dips (Bank)": {
+    desc: "Hände auf einer Bank hinter dir, Hüfte absenken und durch Trizeps zurückdrücken. Beine gestreckt = schwerer. Schultern unten halten!",
+    muscles: ["Trizeps","Vordere Schulter","Brust"],
+    ytUrl: "https://www.youtube.com/results?search_query=Trizeps+Dips+Bank+Technik+Tutorial+Deutsch"
+  },
+  "Cable Tricep Pushdown": {
+    desc: "Am Kabelzug mit Seil oder Stange: Ellbogen fixiert, Unterarme nach unten drücken. Ellbogen nah am Körper, keine Ausweichbewegung. Klassische Trizeps-Isolation.",
+    muscles: ["Trizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Trizeps+Kabelzug+Pushdown+Technik+Deutsch+Tutorial"
+  },
+  "Tricep Kickback (KB)": {
+    desc: "Oberkörper vorgebeugt, Oberarm parallel zum Boden fixiert, Unterarm nach hinten strecken. Langsam – kein Schwung! Gute Trizeps-Isolation für Kontur.",
+    muscles: ["Trizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Trizeps+Kickback+Kurzhantel+Technik+Tutorial+Deutsch"
+  },
+  "Overhead Tricep Extension (BB)": {
+    desc: "Langhantel über den Kopf, enger Griff, Unterarme kontrolliert absenken und strecken (French Press). Maximale Dehnung des langen Trizeps-Kopfs.",
+    muscles: ["Trizeps (langer Kopf)"],
+    ytUrl: "https://www.youtube.com/results?search_query=French+Press+Overhead+Tricep+Extension+Langhantel+Technik+Deutsch"
+  },
+  "Cable Tricep Pushdown (Seil)": {
+    desc: "Seilgriff am Kabelzug, beim Drücken nach unten die Enden auseinanderziehen. Stärkere Endkontraktion als mit Stange. Beliebte Finisher-Übung für den Trizeps.",
+    muscles: ["Trizeps"],
+    ytUrl: "https://www.youtube.com/results?search_query=Trizeps+Kabelzug+Seil+Pushdown+Rope+Tutorial+Deutsch"
+  },
+  "Overhead Tricep Extension (KB)": {
+    desc: "Kettlebell mit beiden Händen über den Kopf halten, Unterarme absenken und strecken. Neutraler Griff schont Handgelenke.",
+    muscles: ["Trizeps (langer Kopf)"],
+    ytUrl: "https://www.youtube.com/results?search_query=Kettlebell+Overhead+Tricep+Extension+Tutorial"
+  },
+  "Close-grip Push-up": {
+    desc: "Liegestütz mit enger Handposition (schulterbreit oder enger). Ellbogen bleiben nah am Körper. Sehr effektive Trizeps-Übung ohne Gerät.",
+    muscles: ["Trizeps","Innere Brust","Schulter"],
+    ytUrl: "https://www.youtube.com/results?search_query=Close+Grip+Push+Up+Trizeps+Tutorial+enger+Griff"
+  },
+
+  // ── CARRY ──────────────────────────────────────────
+  "Farmer's Carry": {
+    desc: "Kurzhanteln oder Kettlebells in beiden Händen tragen und gehen. Aufrechte Haltung, Schultern unten und zurück, Core angespannt. Training für Griffkraft, Haltung und Ganzkörperstabilität.",
+    muscles: ["Griffkraft","Trapez","Core","Schulter","Beine"],
+    ytUrl: "https://www.youtube.com/results?search_query=Farmers+Walk+Carry+Technik+Tutorial+Deutsch"
+  },
+  "Suitcase Carry": {
+    desc: "Nur eine Seite beladen (wie ein Koffer). Der Rumpf muss Seitneigung aktiv verhindern. Einseitiges Training für Core-Stabilität und Quadratus lumborum.",
+    muscles: ["Core (Anti-Lateralflexion)","Griffkraft","Quadratus lumborum"],
+    ytUrl: "https://www.youtube.com/results?search_query=Suitcase+Carry+Walk+Tutorial+Core+Anti+Lateral"
+  },
+  "Front-rack Carry (KB)": {
+    desc: "Kettlebells in Rack-Position (auf den Unterarmen vor der Brust). Oberkörper komplett aufrecht halten. Trainiert Haltung, Schultern und Core gleichzeitig.",
+    muscles: ["Core","Schulter","Trapez","Haltungsmuskulatur"],
+    ytUrl: "https://www.youtube.com/results?search_query=Front+Rack+Carry+Kettlebell+Tutorial+Technique"
+  },
+  "Overhead Carry": {
+    desc: "Gewicht über dem Kopf tragen und gehen. Arm komplett gestreckt, Schulter aktiv nach unten drücken. Maximale Schulter- und Core-Stabilisierung unter Belastung.",
+    muscles: ["Schulter","Rotatorenmanschette","Core","Trapez"],
+    ytUrl: "https://www.youtube.com/results?search_query=Overhead+Carry+Walk+Tutorial+Shoulder+Stability"
+  },
+  "Trap Bar Carry": {
+    desc: "Mit der Hex-Bar tragen statt heben. Neutraler Griff, symmetrische Last. Griffkraft und Haltung wie beim Farmer's Walk, aber mit komfortablerer Griffposition.",
+    muscles: ["Griffkraft","Core","Trapez","Beine"],
+    ytUrl: "https://www.youtube.com/results?search_query=Trap+Bar+Carry+Hex+Bar+Tutorial+Farmers+Walk"
+  },
+  "Sled Push": {
+    desc: "Schlitten mit den Händen nach vorne schieben. Vorwärts geneigter Körper, kurze explosive Schritte. Konditionierung und Kraft-Ausdauer ohne Belastung für die Wirbelsäule.",
+    muscles: ["Beine","Gluteus","Core","Schulter"],
+    ytUrl: "https://www.youtube.com/results?search_query=Sled+Push+Tutorial+Technik+Konditionierung+Deutsch"
+  },
+  "Kettlebell Rack Walk": {
+    desc: "Eine Kettlebell in Rack-Position auf einer Seite tragen. Asymmetrische Last verlangt starke Anti-Lateralflexion. Kombination aus Suitcase und Front-Rack.",
+    muscles: ["Core (Anti-Lateral)","Schulter","Griffkraft"],
+    ytUrl: "https://www.youtube.com/results?search_query=Kettlebell+Rack+Walk+Tutorial+Core+Carry"
+  },
+};
+
+// Generiert YouTube-Suche-URL für unbekannte Übungen
+function getYouTubeUrl(exerciseName){
+  if(EXERCISE_DB[exerciseName] && EXERCISE_DB[exerciseName].ytUrl){
+    return EXERCISE_DB[exerciseName].ytUrl;
+  }
+  const query = encodeURIComponent(exerciseName + ' Übung Tutorial Technik Deutsch');
+  return `https://www.youtube.com/results?search_query=${query}`;
+}
+
+function showExerciseInfo(exerciseName, pattern){
+  const db = EXERCISE_DB[exerciseName];
+  document.getElementById('info-pattern').textContent = pattern;
+  document.getElementById('info-title').textContent = exerciseName;
+
+  if(db){
+    document.getElementById('info-desc').textContent = db.desc;
+    const muscleHtml = db.muscles.map(m=>`<span class="muscle-tag">${m}</span>`).join('');
+    document.getElementById('info-muscles').innerHTML = muscleHtml;
+  } else {
+    document.getElementById('info-desc').textContent = 'Keine Beschreibung verfügbar. Sieh dir das Tutorial auf YouTube an.';
+    document.getElementById('info-muscles').innerHTML = '';
+  }
+
+  const ytUrl = getYouTubeUrl(exerciseName);
+  document.getElementById('info-links').innerHTML = `
+    <a class="yt-link" href="${ytUrl}" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8z"/><polygon fill="white" points="9.7 15.5 15.8 12 9.7 8.5"/></svg>
+      Tutorial auf YouTube ansehen
+    </a>`;
+
+  document.getElementById('info-overlay').classList.add('open');
+}
+
+function closeInfoSheet(e){
+  if(e.target === document.getElementById('info-overlay')){
+    document.getElementById('info-overlay').classList.remove('open');
+  }
+}
+
+
 // INIT
 // =====================================================
+// Event delegation für Info-Buttons (vermeidet Inline-onclick Probleme)
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.info-btn');
+  if(btn){
+    const name = btn.dataset.exname;
+    const pat  = btn.dataset.expat || '';
+    if(name) showExerciseInfo(name, pat);
+  }
+});
+
 renderWeek();
 updateGlobalProgress();
 </script>
+
+<!-- ÜBUNGS-INFO OVERLAY -->
+<div class="info-overlay" id="info-overlay" onclick="closeInfoSheet(event)">
+  <div class="info-sheet" id="info-sheet">
+    <div class="info-sheet-handle"></div>
+    <div class="info-sheet-pattern" id="info-pattern"></div>
+    <div class="info-sheet-title" id="info-title"></div>
+    <div class="info-sheet-desc" id="info-desc"></div>
+    <div class="info-sheet-muscles" id="info-muscles"></div>
+    <div class="info-sheet-links" id="info-links"></div>
+    <button class="info-close-btn" onclick="document.getElementById('info-overlay').classList.remove('open')">Schließen</button>
+  </div>
+</div>
+
 </body>
 </html>
