@@ -1426,8 +1426,8 @@ function renderTagesLog(wi,di){
   const schlafQ=parseInt(lv(tlk(wi,di,'schlafq')))||0;
 
   let html=`<div class="tageslog-section">
-    <button class="tageslog-toggle-btn" onclick="toggleTagesLog(${wi},${di})">
-      <span>📋 Tages-Log</span><span id="tltogarrow-${wi}-${di}">▾</span>
+    <button class="tageslog-toggle-btn" data-wi="${wi}" data-di="${di}" onclick="toggleTagesLogBtn(this)">
+      <span>📋 Tages-Log</span><span class="tltogarrow">▾</span>
     </button>
     <div class="tageslog-body" id="tlbody-${wi}-${di}">`;
 
@@ -1473,9 +1473,21 @@ function renderTagesLog(wi,di){
 
 function toggleTagesLog(wi,di){
   const body=document.getElementById(`tlbody-${wi}-${di}`);
-  const arr=document.getElementById(`tltogarrow-${wi}-${di}`);
+  if(!body) return;
+  const btn=body.previousElementSibling;
+  const arr=btn ? btn.querySelector('.tltogarrow') : null;
   const open=body.classList.toggle('open');
-  arr.textContent=open?'▴':'▾';
+  if(arr) arr.textContent=open?'▴':'▾';
+}
+
+function toggleTagesLogBtn(btn){
+  const wi=btn.dataset.wi;
+  const di=btn.dataset.di;
+  const body=document.getElementById(`tlbody-${wi}-${di}`);
+  if(!body) return;
+  const arr=btn.querySelector('.tltogarrow');
+  const open=body.classList.toggle('open');
+  if(arr) arr.textContent=open?'▴':'▾';
 }
 
 function setScale(wi,di,field,val){
