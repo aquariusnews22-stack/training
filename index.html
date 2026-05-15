@@ -146,7 +146,7 @@ header p{font-size:11px;color:var(--muted);}
 .stretch-check.done{background:var(--teal-dim);border-color:var(--teal);}
 .stretch-info{flex:1;}
 .stretch-name{font-size:13px;font-weight:500;color:var(--text);}
-.stretch-dur{font-size:11px;color:var(--muted);}
+.stretch-dur{font-size:11px;color:var(--muted);}.stretch-desc{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5;font-style:italic;}
 
 /* ===== DONE BANNER ===== */
 .day-done-banner{display:none;background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--radius);padding:12px;margin-top:12px;text-align:center;font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:.05em;}
@@ -316,6 +316,11 @@ header p{font-size:11px;color:var(--muted);}
 .yt-link:active{opacity:.7;}
 .yt-link svg{width:20px;height:20px;flex-shrink:0;}
 .info-close-btn{display:block;width:100%;margin-top:14px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted);font-size:13px;font-family:'DM Mono',monospace;text-align:center;cursor:pointer;}
+
+
+/* ===== EDITIERBARE FELDER ===== */
+[contenteditable="true"]:focus{outline:1px dashed var(--accent);border-radius:3px;padding:1px 3px;}
+[contenteditable="true"]:empty:before{content:attr(placeholder);color:var(--muted);}
 
 /* ===== PRINT ===== */
 @media print{
@@ -914,6 +919,20 @@ function toggleWuExtra(wi,di){
   checkDayDone(wi,di); updateGlobalProgress();
 }
 
+
+// =====================================================
+// EDITIERBARE ÜBUNGSNAMEN – State-Keys & Speichern
+// =====================================================
+const exNameKey   = (wi,di,ei) => `tp3_w${wi}d${di}e${ei}_customname`;
+const exDetailKey = (wi,di,ei) => `tp3_w${wi}d${di}e${ei}_customdetail`;
+
+function saveExName(wi, di, ei, val){
+  if(val && val.trim()) sv(exNameKey(wi,di,ei), val.trim());
+}
+function saveExDetail(wi, di, ei, val){
+  if(val && val.trim()) sv(exDetailKey(wi,di,ei), val.trim());
+}
+
 // =====================================================
 function countDayChecks(wi,di){
   const day=DATA[wi].days[di];
@@ -974,6 +993,55 @@ function renderWeekNav(){
 // =====================================================
 // WOCHE RENDERN
 // =====================================================
+
+// =====================================================
+// ZUSATZ-ÜBUNGEN (freie editierbare Felder pro Tag)
+// =====================================================
+function renderExtraExercises(wi, diKey, count){
+  let html=`<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">+ Eigene Übungen</div>`;
+  for(let xi=0;xi<count;xi++){
+    const xNameKey =`tp3_w${wi}_d${diKey}_ex${xi}_name`;
+    const xSetsKey =`tp3_w${wi}_d${diKey}_ex${xi}_sets`;
+    const xWtKey   =`tp3_w${wi}_d${diKey}_ex${xi}_wt`;
+    const xNoteKey =`tp3_w${wi}_d${diKey}_ex${xi}_note`;
+    const xDoneKey =`tp3_w${wi}_d${diKey}_ex${xi}_done`;
+    const xName=lv(xNameKey);
+    const xSets=lv(xSetsKey);
+    const xWt  =lv(xWtKey);
+    const xNote=lv(xNoteKey);
+    const xDone=lb(xDoneKey);
+    html+=`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 11px;margin-bottom:7px">
+      <div style="display:flex;gap:7px;margin-bottom:6px;align-items:center">
+        <button class="set-btn${xDone?' done':''}" style="width:34px;height:34px;flex-shrink:0"
+          data-donekey="${xDoneKey}" onclick="toggleExDone(this,'${xDoneKey}')">${xDone?'✓':'○'}</button>
+        <input type="text" placeholder="Übungsname…" value="${xName}"
+          onchange="sv('${xNameKey}',this.value)"
+          style="flex:1;font-size:13px;padding:6px 9px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)">
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <input type="text" placeholder="Sets × Reps" value="${xSets}"
+          onchange="sv('${xSetsKey}',this.value)"
+          style="flex:1;min-width:90px;font-size:12px;padding:6px 9px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)">
+        <input type="number" placeholder="kg" value="${xWt}"
+          onchange="sv('${xWtKey}',this.value)"
+          style="flex:0 0 65px;font-size:12px;padding:6px 9px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)" inputmode="decimal">
+        <input type="text" placeholder="Notiz…" value="${xNote}"
+          onchange="sv('${xNoteKey}',this.value)"
+          style="flex:1;min-width:80px;font-size:12px;padding:6px 9px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)">
+      </div>
+    </div>`;
+  }
+  html+=`</div>`;
+  return html;
+}
+
+function toggleExDone(btn, key){
+  const nv=!lb(key); sb(key,nv);
+  btn.className='set-btn'+(nv?' done':'');
+  btn.textContent=nv?'✓':'○';
+}
+
 function renderWeek(){
   renderWeekNav();
   const container=document.getElementById('week-panels');container.innerHTML='';
@@ -993,6 +1061,12 @@ function renderWeek(){
     html+=`<button class="day-tab${di===curDay[wi]?' active':''}${isDone?' done':''}" onclick="switchDay(${wi},${di})">${d.label}</button>`;
   });
   html+=`<button class="day-tab hiit-tab${curDay[wi]===99?' active':''}" onclick="switchDay(${wi},99)">HIIT</button>`;
+  // Freies Training Tabs (3 Stück, Index 200/201/202)
+  for(let fdi=0;fdi<3;fdi++){
+    const fLabel=lv(fdk(wi,fdi,'label'))||`Freies Training ${fdi+1}`;
+    const fDone=lv(fdk(wi,fdi,'date'))||lv(fdk(wi,fdi,'note'));
+    html+=`<button class="day-tab${curDay[wi]===(200+fdi)?' active':''}${fDone?' done':''}" style="border-color:var(--teal);color:${curDay[wi]===(200+fdi)?'var(--teal)':'var(--muted)'}" onclick="switchDay(${wi},${200+fdi})">🏃 Frei ${fdi+1}</button>`;
+  }
   html+=`</div>`;
 
   // Tag-Inhalte A–D
@@ -1015,12 +1089,22 @@ function renderWeek(){
     d.exercises.forEach((ex,ei)=>{
       const allSetsDone=Array.from({length:ex.sets},(_,si)=>lb(sk(wi,di,ei,si))).every(Boolean);
       const progressHtml=getProgressIndicator(wi,di,ei);
+      // Gespeicherte benutzerdefinierte Namen/Details laden
+      const displayName=lv(exNameKey(wi,di,ei))||ex.name;
+      const displayDetail=lv(exDetailKey(wi,di,ei))||ex.detail;
       html+=`<div class="exercise-card${allSetsDone?' completed':''}" id="exc-${wi}-${di}-${ei}">
         <div class="exercise-header">
           <div class="pattern-chip ${ex.compound?'chip-compound':'chip-accessory'}">${ex.pat}</div>
           <div class="exercise-info">
-            <div class="exercise-name-row"><span class="exercise-name">${ex.name}</span><button class="info-btn" data-exname="${ex.name}" data-expat="${ex.pat}" title="Info &amp; Tutorial">ⓘ</button></div>
-            <div class="exercise-detail">${ex.detail}</div>
+            <div class="exercise-name-row">
+              <span class="exercise-name" contenteditable="true"
+                onblur="saveExName(${wi},${di},${ei},this.textContent.trim())"
+                title="Antippen zum Bearbeiten">${displayName}</span>
+              <button class="info-btn" data-exname="${ex.name}" data-expat="${ex.pat}" title="Info &amp; Tutorial">ⓘ</button>
+            </div>
+            <div class="exercise-detail" contenteditable="true"
+              onblur="saveExDetail(${wi},${di},${ei},this.textContent.trim())"
+              title="Antippen zum Bearbeiten">${displayDetail}</div>
             ${progressHtml}
           </div>
         </div>
@@ -1075,12 +1159,18 @@ function renderWeek(){
       html+=`<div class="stretch-item">
         <button class="stretch-check${done?' done':''}" id="strbtn-${wi}-${di}-${sti}" onclick="toggleStretch2(${wi},${di},${sti})">${done?'✓':'○'}</button>
         <div class="stretch-info">
-          <div class="stretch-name">${s.name}</div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <span class="stretch-name">${s.name}</span>
+            <button class="info-btn" data-stretchname="${s.name}" title="Wie geht das?">ⓘ</button>
+          </div>
           <div class="stretch-dur">${s.dur}</div>
         </div>
       </div>`;
     });
     html+=`</div></div>`;
+
+    // Zusatz-Übungen Freifelder
+    html+=renderExtraExercises(wi, di, 3);
 
     // Tages-Log
     html+=renderTagesLog(wi,di);
@@ -1094,8 +1184,73 @@ function renderWeek(){
   // HIIT Tab
   html+=renderHiit(wi,w);
 
-  // Freie Tage
-  html+=renderFreieTage(wi);
+  // Freies Training Content-Panels
+  for(let fdi=0;fdi<3;fdi++){
+    html+=renderFreiesTraining(wi,fdi);
+  }
+
+  // Freies Training inline Panels
+  for(let fdi=0;fdi<3;fdi++){
+    const fdKey=200+fdi;
+    const fDate =lv(fdk(wi,fdi,'date'));
+    const fType =lv(fdk(wi,fdi,'type'))||'Yoga';
+    const fDur  =lv(fdk(wi,fdi,'dur'));
+    const fNote =lv(fdk(wi,fdi,'note'));
+    const FT_TYPES=['Yoga','Mobility','Pilates','Schwimmen','Radfahren','Laufen / Joggen','Spaziergang','Meditation','Klettern','Kampfsport','Sonstiges'];
+    html+=`<div class="day-content${curDay[wi]===fdKey?' active':''}" id="dc-${wi}-${fdKey}">
+      <div class="day-date-header">
+        <span class="day-date-label" style="color:var(--teal)">Freies Training ${fdi+1}</span>
+        <input class="date-input" type="date" value="${fDate}"
+          onchange="sv(fdk(${wi},${fdi},'date'),this.value)" style="max-width:140px">
+      </div>
+      <div class="warmup-card">
+        <span class="card-label">Aktivität 1</span>
+        <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          <select onchange="sv(fdk(${wi},${fdi},'type'),this.value)"
+            style="flex:2;font-size:12px;padding:7px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)">
+            ${FT_TYPES.map(t=>`<option${fType===t?' selected':''}>${t}</option>`).join('')}
+          </select>
+          <input type="number" placeholder="Min." value="${fDur}" inputmode="numeric"
+            onchange="sv(fdk(${wi},${fdi},'dur'),this.value)"
+            style="flex:0 0 65px;font-size:12px;padding:7px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)">
+          <span style="font-size:12px;color:var(--muted);align-self:center">Min.</span>
+        </div>
+        <textarea placeholder="Was hast du gemacht? Wie war es?"
+          onchange="sv(fdk(${wi},${fdi},'note'),this.value)"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;padding:8px 10px;min-height:60px;resize:vertical">${fNote}</textarea>
+        <div style="height:1px;background:var(--border);margin:10px 0"></div>
+        <span class="card-label">Aktivität 2</span>
+        <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          <input type="text" placeholder="z.B. Yoga, Schwimmen, Spaziergang…" value="${lv(fdk(wi,fdi,'type2'))}"
+            onchange="sv(fdk(${wi},${fdi},'type2'),this.value)"
+            style="flex:2;font-size:12px;padding:7px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)">
+          <input type="number" placeholder="Min." value="${lv(fdk(wi,fdi,'dur2'))}" inputmode="numeric"
+            onchange="sv(fdk(${wi},${fdi},'dur2'),this.value)"
+            style="flex:0 0 65px;font-size:12px;padding:7px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)">
+          <span style="font-size:12px;color:var(--muted);align-self:center">Min.</span>
+        </div>
+        <textarea placeholder="Notizen zu Aktivität 2…"
+          onchange="sv(fdk(${wi},${fdi},'note2'),this.value)"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;padding:8px 10px;min-height:50px;resize:vertical">${lv(fdk(wi,fdi,'note2'))}</textarea>
+        <div style="height:1px;background:var(--border);margin:10px 0"></div>
+        <span class="card-label">Aktivität 3</span>
+        <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          <input type="text" placeholder="z.B. Meditation, Stretching…" value="${lv(fdk(wi,fdi,'type3'))}"
+            onchange="sv(fdk(${wi},${fdi},'type3'),this.value)"
+            style="flex:2;font-size:12px;padding:7px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)">
+          <input type="number" placeholder="Min." value="${lv(fdk(wi,fdi,'dur3'))}" inputmode="numeric"
+            onchange="sv(fdk(${wi},${fdi},'dur3'),this.value)"
+            style="flex:0 0 65px;font-size:12px;padding:7px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)">
+          <span style="font-size:12px;color:var(--muted);align-self:center">Min.</span>
+        </div>
+        <textarea placeholder="Notizen zu Aktivität 3…"
+          onchange="sv(fdk(${wi},${fdi},'note3'),this.value)"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;padding:8px 10px;min-height:50px;resize:vertical">${lv(fdk(wi,fdi,'note3'))}</textarea>
+      </div>`;
+    html+=renderExtraExercises(wi,'fd'+fdi,5);
+    html+=renderTagesLog(wi,'fd'+fdi);
+    html+=`</div>`;
+  }
 
   // Navigation
   html+=`<div class="nav-arrows">`;
@@ -1177,30 +1332,86 @@ function toggleHiitRound(wi,ri){
 // =====================================================
 // FREIE TAGE RENDERN
 // =====================================================
+function renderFreiesTraining(wi, fdi){
+  const types=['Yoga','Spaziergang','Schwimmen','Radfahren','Laufen','Kraft','Dehnen','Mobility','Meditation','Sonstiges'];
+  const di = 200+fdi;
+  const fDate=lv(fdk(wi,fdi,'date'));
+  const fType=lv(fdk(wi,fdi,'type'))||'Yoga';
+  const fDur=lv(fdk(wi,fdi,'dur'));
+  const fNote=lv(fdk(wi,fdi,'note'));
+  const fLabel=lv(fdk(wi,fdi,'label'))||`Freies Training ${fdi+1}`;
+  const fNote2=lv(fdk(wi,fdi,'note2'));
+  const fIntensity=lv(fdk(wi,fdi,'intensity'));
+
+  let html=`<div class="day-content${curDay[wi]===di?' active':''}" id="dc-${wi}-${di}">`;
+  // Header mit editierbarem Namen
+  html+=`<div class="day-date-header">
+    <input type="text" value="${fLabel}" placeholder="Bezeichnung…"
+      onchange="sv(fdk(${wi},${fdi},'label'),this.value)"
+      style="flex:1;font-family:'DM Mono',monospace;font-size:13px;font-weight:500;background:transparent;border:none;border-bottom:1px solid var(--border);border-radius:0;padding:4px 0;color:var(--teal)">
+    <input class="date-input" type="date" value="${fDate}"
+      onchange="sv(fdk(${wi},${fdi},'date'),this.value)" style="max-width:150px">
+  </div>`;
+
+  // Aktivitäts-Card
+  html+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:10px">
+    <span class="card-label">Aktivität</span>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <select onchange="sv(fdk(${wi},${fdi},'type'),this.value)" style="flex:2;min-width:120px">
+        ${types.map(t=>`<option${fType===t?' selected':''}>${t}</option>`).join('')}
+      </select>
+      <input type="number" placeholder="Min." value="${fDur}"
+        onchange="sv(fdk(${wi},${fdi},'dur'),this.value)"
+        inputmode="numeric" style="flex:0 0 80px">
+    </div>
+    <input type="text" placeholder="Intensität / Ort / Besonderheit…" value="${fIntensity}"
+      onchange="sv(fdk(${wi},${fdi},'intensity'),this.value)" style="margin-bottom:8px">
+    <textarea placeholder="Notizen zur Einheit…"
+      onchange="sv(fdk(${wi},${fdi},'note'),this.value)"
+      style="min-height:60px">${fNote}</textarea>
+  </div>`;
+
+  // Tages-Log (gleiche Funktion wie bei Trainingstagen)
+  html+=renderTagesLog(wi, di);
+
+  html+=`</div>`;
+  return html;
+}
+
+// Alte Funktion als Alias beibehalten (falls noch referenziert)
 function renderFreieTage(wi){
-  const types=['Yoga','Spaziergang','Schwimmen','Radfahren','Laufen','Meditation','Sonstiges'];
-  let html=`<div class="free-days-section"><div class="free-days-title">Freie Tage / Weitere Aktivitäten</div>`;
+  const ACTIVITY_TYPES=['Yoga','Mobility','Pilates','Schwimmen','Radfahren','Laufen / Joggen','Spaziergang','Meditation','Klettern','Kampfsport','Sonstiges'];
+  let html=`<div class="free-days-section"><div class="free-days-title">Freies Training</div>`;
   for(let fdi=0;fdi<3;fdi++){
-    const fDate=lv(fdk(wi,fdi,'date'));
-    const fType=lv(fdk(wi,fdi,'type'))||'Yoga';
-    const fDur=lv(fdk(wi,fdi,'dur'));
-    const fNote=lv(fdk(wi,fdi,'note'));
+    const fDate =lv(fdk(wi,fdi,'date'));
+    const fType =lv(fdk(wi,fdi,'type'))||'Yoga';
+    const fDur  =lv(fdk(wi,fdi,'dur'));
+    const fNote =lv(fdk(wi,fdi,'note'));
     html+=`<div class="free-day-card">
       <div class="free-day-header">
-        <span class="free-day-label">Freier Tag ${fdi+1}</span>
-        <input class="date-input" type="date" value="${fDate}" onchange="sv(fdk(${wi},${fdi},'date'),this.value)" style="max-width:140px;margin-left:auto;">
+        <span class="free-day-label">Freies Training ${fdi+1}</span>
+        <input class="date-input" type="date" value="${fDate}"
+          onchange="sv(fdk(${wi},${fdi},'date'),this.value)" style="max-width:140px;margin-left:auto;">
       </div>
       <div class="free-day-fields">
         <div class="free-day-row">
           <select onchange="sv(fdk(${wi},${fdi},'type'),this.value)" style="flex:2">
-            ${types.map(t=>`<option${fType===t?' selected':''}>${t}</option>`).join('')}
+            ${ACTIVITY_TYPES.map(t=>`<option${fType===t?' selected':''}>${t}</option>`).join('')}
           </select>
-          <input type="number" placeholder="Min." value="${fDur}" onchange="sv(fdk(${wi},${fdi},'dur'),this.value)" style="flex:1;max-width:80px" inputmode="numeric">
-          <span style="font-size:12px;color:var(--muted);flex-shrink:0;align-self:center">Min.</span>
+          <input type="number" placeholder="Min." value="${fDur}"
+            onchange="sv(fdk(${wi},${fdi},'dur'),this.value)"
+            style="flex:0 0 65px" inputmode="numeric">
+          <span style="font-size:12px;color:var(--muted);align-self:center;flex-shrink:0">Min.</span>
         </div>
-        <textarea placeholder="Notizen…" onchange="sv(fdk(${wi},${fdi},'note'),this.value)" style="min-height:50px">${fNote}</textarea>
-      </div>
-    </div>`;
+        <textarea placeholder="Was hast du gemacht? Wie war es?" rows="2"
+          onchange="sv(fdk(${wi},${fdi},'note'),this.value)"
+          style="min-height:50px">${fNote}</textarea>
+      </div>`;
+    // Zusatz-Übungen Freifelder
+    html+=renderExtraExercises(wi, 'fd'+fdi, 3);
+    // Tages-Log
+    html+=renderTagesLog(wi, 'fd'+fdi);
+    html+=`</div>`;
   }
   html+=`</div>`;
   return html;
@@ -1306,9 +1517,17 @@ function toggleStretch2(wi,di,sti){
 // =====================================================
 function switchDay(wi,di){
   curDay[wi]=di;
-  document.querySelectorAll(`#dtabs-${wi} .day-tab`).forEach((t,i)=>{
-    t.classList.toggle('active',i===di||(di===99&&i===4));
+  // Alle Tabs deaktivieren, aktiven markieren
+  const allTabs=document.querySelectorAll(`#dtabs-${wi} .day-tab`);
+  allTabs.forEach((t,i)=>{
+    const tabDi=[0,1,2,3,99,200,201,202][i];
+    t.classList.toggle('active',tabDi===di);
+    // Teal-Farbe für freie Tabs
+    if(tabDi>=200){
+      t.style.color=(tabDi===di)?'var(--teal)':'var(--muted)';
+    }
   });
+  // Alle Contents ausblenden, aktiven einblenden
   document.querySelectorAll(`[id^="dc-${wi}-"]`).forEach(el=>el.classList.remove('active'));
   const dc=document.getElementById(`dc-${wi}-${di}`);if(dc)dc.classList.add('active');
 }
@@ -1424,6 +1643,29 @@ function printLog(){
   switchView('log');
 }
 
+
+
+// Ton-Signal am Ende von Timern (Web Audio API – kein externes File nötig)
+function playDoneSound(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const notes=[523,659,784]; // C5, E5, G5 – aufsteigender Akkord
+    notes.forEach((freq,i)=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value=freq;
+      osc.type='sine';
+      const start=ctx.currentTime+i*0.25;
+      gain.gain.setValueAtTime(0,start);
+      gain.gain.linearRampToValueAtTime(0.4,start+0.05);
+      gain.gain.linearRampToValueAtTime(0,start+0.4);
+      osc.start(start);
+      osc.stop(start+0.5);
+    });
+  }catch(e){}
+}
 
 // =====================================================
 // MENTALE STÄRKE – vollständig mit Datum & Verlaufskurve
@@ -1612,8 +1854,9 @@ function renderMental(){
       <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:5px"><span>1 = erschöpft</span><span>Energie</span><span>10 = voller Power</span></div>
       <div style="display:flex;gap:4px;flex-wrap:wrap">`;
   for(let i=1;i<=10;i++){
-    html+=`<button onclick="saveMentalScale('${date}','energie',${i})" data-date="${date}" data-field="energie" data-val="${i}"
-      style="width:32px;height:32px;border-radius:50%;border:1px solid ${energyVal===i?'var(--accent)':'var(--border)'};background:${energyVal===i?'var(--accent-dim)':'transparent'};color:${energyVal===i?'var(--accent)':'var(--muted)'};font-family:'DM Mono',monospace;font-size:11px;transition:all .15s">${i}</button>`;
+    const enActive=(energyVal===i);
+    html+=`<button class="mental-scale-btn ${enActive?'en-active':''}" data-date="${date}" data-field="energie" data-val="${i}"
+      style="width:32px;height:32px;border-radius:50%;border:1.5px solid ${enActive?'var(--accent)':'var(--border)'};background:${enActive?'var(--accent-dim)':'transparent'};color:${enActive?'var(--accent)':'var(--muted)'};font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s">${i}</button>`;
   }
   html+=`</div></div>
     <div>
@@ -1624,8 +1867,9 @@ function renderMental(){
           style="width:70px;padding:7px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Mono',monospace;font-size:12px">
         <span style="font-size:11px;color:var(--muted)">Std.</span>`;
   for(let i=1;i<=5;i++){
-    html+=`<button onclick="saveMentalScale('${date}','schlafq',${i})"
-      style="width:32px;height:32px;border-radius:50%;border:1px solid ${schlafQ===i?'var(--blue)':'var(--border)'};background:${schlafQ===i?'var(--blue-dim)':'transparent'};color:${schlafQ===i?'var(--blue)':'var(--muted)'};font-family:'DM Mono',monospace;font-size:11px;transition:all .15s">${i}</button>`;
+    const sqActive=(schlafQ===i);
+    html+=`<button class="mental-scale-btn ${sqActive?'sq-active':''}" data-date="${date}" data-field="schlafq" data-val="${i}"
+      style="width:32px;height:32px;border-radius:50%;border:1.5px solid ${sqActive?'var(--blue)':'var(--border)'};background:${sqActive?'var(--blue-dim)':'transparent'};color:${sqActive?'var(--blue)':'var(--muted)'};font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s">${i}</button>`;
   }
   html+=`</div></div></div>`;
 
@@ -1634,12 +1878,12 @@ function renderMental(){
     {id:'morgen',icon:'🌅',title:'Morgens – Intention & Start',fields:[
       {type:'text',key:'fokus',label:'Mein Fokus heute ist…'},
       {type:'text',key:'ziel1',label:'Ziel 1'},{type:'text',key:'ziel2',label:'Ziel 2'},{type:'text',key:'ziel3',label:'Ziel 3'},
-      {type:'timer',key:'atem_morgen',label:'2 Min. Atemübung',dur:120},
+      {type:'timer',key:'atem_morgen',label:'2 Min. Atemübung – Box Breathing: 4 Sek. einatmen → 4 Sek. halten → 4 Sek. ausatmen → 4 Sek. halten. Augen schließen, aufrecht sitzen.',dur:120},
       {type:'affirmation',key:'affirmation',label:'Affirmation des Tages'},
     ]},
     {id:'vortraining',icon:'💪',title:'Vor dem Training',fields:[
       {type:'text',key:'warum',label:'Ich trainiere heute, weil…'},
-      {type:'check',key:'powerposen',label:'Power-Pose / Aktivierungsritual (30 Sek.)'},
+      {type:'check',key:'powerposen',label:'Power-Pose (30 Sek.) – Aufrecht stehen, Füße schulterbreit, Hände auf Hüfte oder Arme in V-Form über den Kopf. Kinn leicht hoch, tief einatmen. Haltung der Stärke einnehmen und halten.'},
       {type:'text',key:'vision',label:'Ich sehe mich schon, wie ich…'},
     ]},
     {id:'nachtraining',icon:'🏆',title:'Nach dem Training',fields:[
@@ -1651,7 +1895,7 @@ function renderMental(){
       {type:'text',key:'dank1',label:'Dankbarkeit 1'},{type:'text',key:'dank2',label:'Dankbarkeit 2'},{type:'text',key:'dank3',label:'Dankbarkeit 3'},
       {type:'text',key:'stolz',label:'Was hat mich heute stolz gemacht?'},
       {type:'text',key:'morgen_int',label:'Meine Intention für morgen…'},
-      {type:'timer',key:'atem_abend',label:'5 Min. Body Scan / Atemübung',dur:300},
+      {type:'timer',key:'atem_abend',label:'5 Min. Body Scan – Hinlegen oder bequem sitzen. Aufmerksamkeit langsam von den Füßen bis zum Kopf wandern lassen. Wo ist Spannung? Einfach wahrnehmen, nicht verändern. Mit jedem Ausatmen loslassen.',dur:300},
       {type:'meditation',key:'meditation',label:'Meditation'},
     ]},
   ];
@@ -1685,8 +1929,9 @@ function renderMental(){
             <button class="mental-check-btn${done?' done':''}" id="mchk-${date}-${f.key}" onclick="toggleMentalCheckDate('${k+'_done'}','${date}','${f.key}')">${done?'✓':'○'}</button>
             <span style="font-size:13px;color:var(--text)">${f.label}</span>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
             <button class="mental-timer-btn" id="mentimer-${date}-${f.key}" onclick="startMentalTimerDate('${date}','${f.key}',${f.dur})">▶ Start</button>
+            <button class="mental-timer-btn" style="border-color:var(--red-border);color:var(--red)" onclick="stopMentalTimer('${date}','${f.key}')">■ Stop</button>
             <span class="mental-timer-disp" id="mentdisp-${date}-${f.key}"></span>
           </div>
         </div>`;
@@ -1811,6 +2056,19 @@ function selectAffirmationDate(k,el,text){
   if(input)input.value=text;
 }
 
+
+function stopMentalTimer(date, field){
+  const timerKey = `${date}-${field}`;
+  if(mentalTimers[timerKey]){
+    clearInterval(mentalTimers[timerKey]);
+    delete mentalTimers[timerKey];
+  }
+  const btn  = document.getElementById(`mentimer-${timerKey}`);
+  const disp = document.getElementById(`mentdisp-${timerKey}`);
+  if(btn) { btn.classList.remove('running'); btn.textContent='▶ Start'; }
+  if(disp) disp.textContent='';
+}
+
 function startMentalTimerDate(date,field,dur){
   const timerKey=`${date}-${field}`;
   if(mentalTimers[timerKey])return;
@@ -1826,7 +2084,8 @@ function startMentalTimerDate(date,field,dur){
       if(btn){btn.classList.remove('running');btn.textContent='✓ Fertig';}
       if(disp)disp.textContent='';
       sb(mmk(date,field+'_done'),true);
-      if(navigator.vibrate)navigator.vibrate([200,100,200]);
+      playDoneSound();
+      if(navigator.vibrate)navigator.vibrate([300,150,300,150,300]);
       renderMental();
     }
     secs--;
@@ -1883,7 +2142,8 @@ function start478Timer(){
         btn.classList.remove('running');
         btn.textContent='✓ Fertig';
         if(disp) disp.textContent='';
-        if(navigator.vibrate) navigator.vibrate([300,150,300]);
+        playDoneSound();
+        if(navigator.vibrate) navigator.vibrate([300,150,300,150,300]);
         return;
       }
       secs=phases[pi].dur;
@@ -2608,15 +2868,43 @@ function closeInfoSheet(e){
 
 // INIT
 // =====================================================
-// Event delegation für Info-Buttons (vermeidet Inline-onclick Probleme)
+
+const STRETCH_DB = {"Hüftbeuger-Dehnung (kniend)": "Knie auf dem Boden, vorderes Bein 90° angewinkelt. Hüfte nach vorne-unten schieben. Rücken gerade, Becken leicht kippen. Dehnung im vorderen Oberschenkel/Hüfte spürbar.", "Quadrizeps-Stretch (stehend)": "Auf einem Bein stehen, das andere Bein am Knöchel nach hinten-oben ziehen. Knie zeigen nach unten, Hüfte nicht ausweichen. An Wand abstützen wenn nötig.", "Adduktoren (Groin Stretch)": "Breiter Stand, Gewicht auf eine Seite verlagern, das andere Bein gestreckt. Oder im Sitzen: Fußsohlen zusammen, Knie nach außen sinken lassen (Butterfly).", "Thorax-Rotation (sitzend)": "Im Sitzen (auf dem Boden oder Stuhl) Oberkörper langsam nach rechts und links drehen. Arme können dabei helfen. Atme bei jeder Rotation aus.", "Brustdehnung (Türrahmen)": "Hände/Unterarme an einem Türrahmen oder Rack. Einen Schritt nach vorne machen und Brust nach vorne-unten sinken lassen. Dehnt Brustmuskeln und vordere Schulter.", "Schulter anterior Stretch": "Arm auf Schulterhöhe hinter den Körper führen (an Rack oder Wand), Körper leicht wegdrehen. Vordere Schulter und Brust werden gedehnt.", "Glute Bridge Dehnung (Figur-4)": "Rückenlage, ein Knöchel auf dem gegenüberliegenden Knie ablegen (Figur-4). Beide Beine zur Brust ziehen. Dehnt den Gluteus und Piriformis intensiv.", "Katze-Kuh": "Im Vierfüßlerstand abwechselnd: Rücken runden (Katze – Bauch einziehen, Kopf runter) und Hohlkreuz machen (Kuh – Brust raus, Kopf hoch). Atme tief ein und aus.", "Lat-Dehnung (hängend oder Wand)": "An Rack oder Türrahmen hängen und zur Seite lehnen. Oder stehend: Arm schräg nach oben, zur Seite lehnen. Dehnt den Latissimus entlang der Seite.", "Hüftbeuger tief": "Tiefer Ausfallschritt, hinteres Knie am Boden. Beide Hände auf dem vorderen Knie. Hüfte nach unten-vorne sinken. Für intensivere Dehnung: Arme über den Kopf strecken.", "Trizeps-Stretch overhead": "Arm über den Kopf, Ellbogen gebeugt, Hand hinter den Kopf. Mit der anderen Hand sanft den Ellbogen nach hinten drücken. Dehnt den langen Trizeps-Kopf.", "Seitstütz-Stretch": "Stehend: einen Arm über den Kopf strecken, zur gegenüberliegenden Seite lehnen. Oder liegend: Arm gestreckt, Körper zur Seite rollen.", "Hamstring-Dehnung liegend": "Rückenlage, ein Bein gestreckt heben. Mit Händen oder einem Band das Bein sanft zur Brust ziehen. Knie leicht gebeugt ist ok. Dehnung in der Rückseite des Oberschenkels.", "Schulter posterior Stretch": "Arm horizontal vor den Körper, mit der anderen Hand den Ellbogen zur gegenüberliegenden Schulter ziehen. Dehnt die hintere Schulter und Kapsel.", "Kind-Haltung": "Aus dem Vierfüßler: Gesäß zu den Fersen, Arme nach vorne gestreckt, Stirn zum Boden. Tief atmen, bei jeder Ausatmung weiter entspannen. Ideal für den Rücken.", "Hüft-Flexor Lunge": "Tiefer Ausfallschritt, hinteres Knie am Boden. Oberkörper aufrecht. Für mehr Intensität: hinteres Bein leicht anheben oder Arm gegenüber strecken.", "Pigeon Pose": "Aus dem Vierfüßler: ein Bein nach vorne bringen, Schienbein möglichst parallel. Hinteres Bein gestreckt. Oberkörper nach vorne absenken. Intensivste Dehnung für Gluteus/Piriformis.", "Wadenstretch": "Stehend, eine Ferse auf dem Boden, Bein gestreckt, Zehen nach oben ziehen (an Wand). Oder: Ferse über Stufe hängen lassen. Dehnt Wadenmuskel und Achillessehne.", "Hüftbeuger-Dehnung": "Knie auf dem Boden, vorderes Bein 90°. Hüfte nach vorne-unten schieben bis Dehnung spürbar. Für mehr: hinteres Bein etwas anheben oder Arme über den Kopf.", "Quadrizeps stehend": "Auf einem Bein stehend, den anderen Fuß am Knöchel fassen und Richtung Gesäß ziehen. Knie zeigen nach unten, Hüfte gerade halten.", "Adduktoren": "Breiter Stand seitlich, auf eine Seite absinken während das andere Bein gestreckt bleibt. Oder sitzend: Fußsohlen zusammen (Butterfly), Knie sanft nach außen drücken.", "Thorax-Rotation": "Sitzend oder stehend: Oberkörper langsam von einer Seite zur anderen drehen. Hände verschränkt oder einen Stab quer über die Schultern legen.", "Rücken-Twist liegend": "Rückenlage: ein Knie zur Brust, dann zur gegenüberliegenden Seite rollen lassen. Schulterblätter bleiben am Boden. Sanfte Wirbelsäulenrotation.", "Adduktoren sanft": "Liegend oder sitzend, Beine leicht gespreizt, sanft auseinander führen. Keine Schmerzen – nur leichtes Ziehen. Besonders gut während der Menstruation.", "Brustdehnung": "Hände hinter dem Rücken verschränken, Brust nach vorne herausstrecken und Schultern nach hinten-unten drücken. Oder Unterarme an Türrahmen, einen Schritt nach vorne.", "Schulter posterior": "Arm horizontal vor den Körper, mit der anderen Hand Ellbogen Richtung gegenüberliegende Schulter ziehen. Hält 30 Sekunden.", "Hüft-Circles (stehend)": "Hände in die Hüfte, große Kreisbewegungen mit der Hüfte – erst 10× eine Richtung, dann 10× andere Richtung. Mobilisiert das Hüftgelenk dynamisch.", "Schulter-Pendel": "Oberkörper nach vorne geneigt, Arm hängt entspannt. Kleiner Pendel-Bewegungen: vor/zurück, seitwärts, im Kreis. Sanfte Schulter-Mobilisation ohne Belastung."};
+// Event delegation für Info-Buttons und Stretch-Info-Buttons
 document.addEventListener('click', function(e){
+  // Mental Skalen-Buttons (Energie & Schlaf)
+  const scaleBtn = e.target.closest('.mental-scale-btn');
+  if(scaleBtn){
+    const date  = scaleBtn.dataset.date;
+    const field = scaleBtn.dataset.field;
+    const val   = parseInt(scaleBtn.dataset.val);
+    if(date && field && val) saveMentalScale(date, field, val);
+    return;
+  }
   const btn = e.target.closest('.info-btn');
   if(btn){
-    const name = btn.dataset.exname;
-    const pat  = btn.dataset.expat || '';
-    if(name) showExerciseInfo(name, pat);
+    if(btn.dataset.exname){
+      showExerciseInfo(btn.dataset.exname, btn.dataset.expat || '');
+    } else if(btn.dataset.stretchname){
+      showStretchInfo(btn.dataset.stretchname);
+    }
   }
 });
+
+function showStretchInfo(name){
+  const desc = STRETCH_DB[name] || 'Dehne diese Muskelgruppe sanft für die angegebene Dauer.';
+  document.getElementById('info-pattern').textContent = 'Stretching';
+  document.getElementById('info-title').textContent = name;
+  document.getElementById('info-desc').textContent = desc;
+  document.getElementById('info-muscles').innerHTML = '';
+  const ytUrl = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(name + ' Dehnung Tutorial');
+  document.getElementById('info-links').innerHTML = `
+    <a class="yt-link" href="${ytUrl}" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8z"/><polygon fill="white" points="9.7 15.5 15.8 12 9.7 8.5"/></svg>
+      Tutorial auf YouTube
+    </a>`;
+  document.getElementById('info-overlay').classList.add('open');
+}
 
 renderWeek();
 updateGlobalProgress();
